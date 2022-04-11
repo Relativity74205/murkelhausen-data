@@ -83,46 +83,10 @@ class Settings(BaseSettings):
 
         @classmethod
         def customise_sources(cls, init_settings, env_settings, file_secret_settings):
-            return env_loader, user_toml_loader, default_toml_loader
+            return env_settings, default_toml_loader
 
         env_prefix = "murkelhausen_"
-
-
-def env_loader(settings: BaseSettings):
-    """Load environment variables into the config."""
-    length_app_name = len("murkelhausen")
-    env_updates = {
-        k[length_app_name + 1 :]: v
-        for k, v in os.environ.items()
-        if k.startswith("MURKELHAUSEN")
-    }
-    log.info(f"Reading the following config variables from env: {[*env_updates]}")
-
-    env_dict: Dict[str, Dict] = defaultdict(dict)
-    for env_var, env_val in env_updates.items():
-        # parse something like MURKELHAUSEN_APP__LOGLEVEL into section=app and key=loglevel
-        try:
-            section, key = [s.lower() for s in env_var.split("__", 1)]
-        except ValueError:
-            log.warning(
-                f"Tried to parse environment variable '{env_var}', but couldn't."
-            )
-            continue
-        if section not in settings.__fields__.keys():
-            log.warning(
-                f"This config doesn't contain a section '{section}', "
-                f"did you mean one of '{list(settings.__fields__.keys())}' instead?"
-            )
-            continue
-        if key not in settings.__fields__[section].type_.__fields__.keys():
-            log.warning(
-                f"This config doesn't contain a key '{key}' in section '{section}', "
-                f"did you mean one of '{list(settings.__fields__[section].type_.__fields__.keys())}' instead?"
-            )
-            continue
-        env_dict[section][key] = env_val
-
-    return env_dict
+        env_nested_delimiter = "__"
 
 
 def default_toml_loader(settings: BaseSettings) -> MutableMapping[str, Any]:

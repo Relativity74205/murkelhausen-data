@@ -7,6 +7,7 @@ from murkelhausen.weather import nmi, owm
 from murkelhausen.util import backend
 from murkelhausen import cfg
 
+
 schedule = IntervalSchedule(interval=timedelta(minutes=10))
 
 with Flow("GetWeatherData", schedule=schedule) as flow:
