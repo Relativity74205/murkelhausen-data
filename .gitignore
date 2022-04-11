@@ -1,0 +1,26 @@
+# binaries
+build
+dist
+wheelhouse
+
+# caches
+docs/autodoc
+.mypy_cache
+.pytest_cache
+.coverage
+
+# tool artifacts
+pip-wheel-metadata
+*.py[cod]
+*.egg-info
+.python-version
+
+# dev stuff
+.idea
+
+# user config
+user.toml
+
+# precect
+supervisord.pid
+supervisord.log

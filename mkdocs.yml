@@ -1,0 +1,22 @@
+site_name: Recipes from Murkelhausen
+docs_dir: recipes
+
+#nav:
+#  - Backen:
+#      - 'A': 'Backen/brot.md'
+#      - 'B': 'Backen/butterstuten.md'
+
+theme:
+  name: "material"
+  palette:
+    scheme: preference
+    primary: teal
+    accent: purple
+
+
+plugins:
+- search
+markdown_extensions:
+- pymdownx.superfences
+- pymdownx.snippets:
+    check_paths: true

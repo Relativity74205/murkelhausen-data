@@ -1,0 +1,22 @@
+[app]
+loglevel = "DEBUG"
+data_path = "data"
+[[app.cities]]
+    name = "Mülheim"
+    gps_lat = 51.418568
+    gps_lon = 6.884523
+
+[weather_owm]
+units = "metric"
+api_key = ""
+url_weather = "http://api.openweathermap.org/data/2.5/weather"
+url_onecall = "http://api.openweathermap.org/data/2.5/onecall"
+
+[weather_nmi]
+url_compact = "https://api.met.no/weatherapi/locationforecast/2.0/compact"
+url_complete = "https://api.met.no/weatherapi/locationforecast/2.0/complete"
+
+[s3]
+bucket = "murkelhausen-weather"
+aws_access_key_id = "AKIAYNIWNYJNLYTLAPGG"
+aws_secret_access_key = ""
