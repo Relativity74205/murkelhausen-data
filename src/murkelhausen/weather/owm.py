@@ -37,9 +37,11 @@ def _query_owm(url: str, city: City, api_key: str, units: str) -> dict:
     if r.status_code == 200:
         return_dict: dict = r.json()
         return return_dict
+    elif r.status_code == 401:
+        raise RuntimeError(f"Authentication error, {api_key=}.")
     else:
         raise RuntimeError(
-            f"Query to openweatherapi one call api returned non 200 status code for city {city.name}: "
+            f"Query to openweatherapi one call api returned non 200 status code for city {city.name} with {api_key=}: "
             f"status_code: {r.status_code}"
             f"response_text: {r.text}"
         )
