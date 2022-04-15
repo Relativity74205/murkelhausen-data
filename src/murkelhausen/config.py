@@ -18,15 +18,14 @@ underscore, e.g. "app__loglevel", and
 environment variables need to additionally start with CLV and
 a single underscore before that, e.g. CLV_APP__LOGLEVEL.
 """
-
 from collections import defaultdict
-import os
 from logging import getLogger
 from pathlib import Path
-from typing import Literal, Dict, Any, List, MutableMapping
+from typing import Literal, Any, MutableMapping
 import importlib.resources
 
 from pydantic import BaseSettings, BaseModel, validator
+from prefect import context
 import toml
 
 log = getLogger(__name__)
@@ -61,7 +60,7 @@ class S3(BaseModel, validate_assignment=True):
 class App(BaseModel):
     loglevel: loglevels
     data_path: str
-    cities: List[City]
+    cities: list[City]
 
     @validator("cities")
     def check_cities(cls, cities):
@@ -83,10 +82,7 @@ class Settings(BaseSettings):
 
         @classmethod
         def customise_sources(cls, init_settings, env_settings, file_secret_settings):
-            return env_settings, default_toml_loader
-
-        env_prefix = "murkelhausen_"
-        env_nested_delimiter = "__"
+            return prefect_secrets_loader, default_toml_loader
 
 
 def default_toml_loader(settings: BaseSettings) -> MutableMapping[str, Any]:
@@ -100,6 +96,17 @@ def default_toml_loader(settings: BaseSettings) -> MutableMapping[str, Any]:
             f"Default config expected at src/murkelhausen/default.toml, but not found."
         )
         raise RuntimeError("Config not found, aborting!")
+
+
+def prefect_secrets_loader(*_) -> MutableMapping[str, Any]:
+    d = defaultdict(dict)
+    prefect_secrets = context.get("secrets", {})
+    for secret_key, secret_value in prefect_secrets.items():
+        app_name, config_section, config_attribute = secret_key.split("__")
+        if app_name == "murkelhausen-data":
+            d[config_section][config_attribute] = secret_value
+
+    return d
 
 
 def user_toml_loader(settings: BaseSettings):
