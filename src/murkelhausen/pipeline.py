@@ -1,25 +1,37 @@
 from datetime import timedelta
-from logging import getLogger
 
-from prefect import Flow
+from prefect import Flow, task
+import prefect
 from prefect.schedules import IntervalSchedule
+from prefect.tasks.secrets import PrefectSecret
 
 from murkelhausen.weather import nmi, owm
 from murkelhausen.util import backend
 from murkelhausen import cfg
 
-log = getLogger(__name__)
+logger = prefect.context.get("logger")
 
 schedule = IntervalSchedule(interval=timedelta(minutes=10))
+
+
+@task
+def test(secret):
+    logger.info(f"test_task {secret=}")
+
 
 with Flow("GetWeatherData", schedule=schedule) as flow:
     city = backend.get_city_object("Mülheim")
     nmi_data = nmi.query_compact(city, cfg.weather_nmi)
     backend.save_json("nmi_compact", nmi_data)
-    # my_secret = PrefectSecret("WEATHEROWM_APIKEY")
+    test(PrefectSecret("foo"))
+    test(PrefectSecret("murkelhausen-data__weather_owm__api_key"))
     # cfg.weather_owm.api_key = my_secret.run()
     owm_data = owm.query_weather(city, cfg.weather_owm)
     backend.save_json("owm_weather", owm_data)
+
+
+
+
 
 flow.register(project_name="murkelhausen")
 # flow.run()
