@@ -25,7 +25,7 @@ with Flow("GetWeatherData", schedule=schedule) as flow:
     backend.save_json("nmi_compact", nmi_data)
     foo_secret = PrefectSecret("foo")
     test(foo_secret)
-    real_secret = PrefectSecret("murkelhausen-data__weather_owm__api_key")
+    real_secret = PrefectSecret("murkelhausendata__weather_owm__api_key")
     test(real_secret)
     real_secret = PrefectSecret("weather_owm__api_key")
     test(real_secret)
