@@ -6,7 +6,7 @@ from logging import getLogger
 
 import requests
 from prefect import task
-from prefect import context
+import prefect
 
 from murkelhausen.config import WeatherNMI, City
 
@@ -15,7 +15,7 @@ log = getLogger(__name__)
 
 @task
 def query_compact(city: City, nmi_settings: WeatherNMI) -> dict:
-    logger = context.get("logger")
+    logger = prefect.context.get("logger")
     logger.info("foo")
     return _query_locationforecast(nmi_settings.url_compact, city)
 

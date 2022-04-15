@@ -25,7 +25,7 @@ from typing import Literal, Any, MutableMapping
 import importlib.resources
 
 from pydantic import BaseSettings, BaseModel, validator
-from prefect import context
+import prefect
 import toml
 
 log = getLogger(__name__)
@@ -99,9 +99,9 @@ def default_toml_loader(settings: BaseSettings) -> MutableMapping[str, Any]:
 
 
 def prefect_secrets_loader(*_) -> MutableMapping[str, Any]:
-    logger = context.get("logger")
+    logger = prefect.context.get("logger")
     d = defaultdict(dict)
-    prefect_secrets = context.get("secrets", {})
+    prefect_secrets = prefect.context.get("secrets", {})
     logger.info(prefect_secrets)
     for secret_key, secret_value in prefect_secrets.items():
         app_name, config_section, config_attribute = secret_key.split("__")
