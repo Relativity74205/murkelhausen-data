@@ -103,6 +103,7 @@ def prefect_secrets_loader(*_) -> MutableMapping[str, Any]:
     d = defaultdict(dict)
     prefect_secrets = prefect.context.get("secrets", {})
     logger.info(prefect_secrets)
+    logger.info(list(prefect.context.keys()))
     for secret_key, secret_value in prefect_secrets.items():
         app_name, config_section, config_attribute = secret_key.split("__")
         if app_name == "murkelhausen-data":
