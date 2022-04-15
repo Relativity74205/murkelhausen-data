@@ -21,5 +21,5 @@ with Flow("GetWeatherData", schedule=schedule) as flow:
     owm_data = owm.query_weather(city, cfg.weather_owm)
     backend.save_json("owm_weather", owm_data)
 
-# flow.register(project_name="murkelhausen")
-flow.run()
+flow.register(project_name="murkelhausen")
+# flow.run()

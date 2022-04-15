@@ -21,6 +21,9 @@ pip-wheel-metadata
 # user config
 user.toml
 
-# precect
+# prefect
 supervisord.pid
 supervisord.log
+
+# data folders
+data
