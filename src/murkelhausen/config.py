@@ -18,14 +18,12 @@ underscore, e.g. "app__loglevel", and
 environment variables need to additionally start with CLV and
 a single underscore before that, e.g. CLV_APP__LOGLEVEL.
 """
-from collections import defaultdict
 from logging import getLogger
 from pathlib import Path
 from typing import Literal, Any, MutableMapping
 import importlib.resources
 
 from pydantic import BaseSettings, BaseModel, validator
-import prefect
 import toml
 
 log = getLogger(__name__)
@@ -82,7 +80,7 @@ class Settings(BaseSettings):
 
         @classmethod
         def customise_sources(cls, init_settings, env_settings, file_secret_settings):
-            return prefect_secrets_loader, default_toml_loader
+            return env_settings, default_toml_loader
 
 
 def default_toml_loader(settings: BaseSettings) -> MutableMapping[str, Any]:
@@ -98,19 +96,19 @@ def default_toml_loader(settings: BaseSettings) -> MutableMapping[str, Any]:
         raise RuntimeError("Config not found, aborting!")
 
 
-def prefect_secrets_loader(*_) -> MutableMapping[str, Any]:
-    logger = prefect.context.get("logger")
-    d = defaultdict(dict)
-    prefect_secrets = prefect.context.get("secrets", {})
-    logger.info(prefect_secrets)
-    logger.info(list(prefect.context.keys()))
-    for secret_key, secret_value in prefect_secrets.items():
-        app_name, config_section, config_attribute = secret_key.split("__")
-        if app_name == "murkelhausen-data":
-            d[config_section][config_attribute] = secret_value
-    logger.info(d)
-
-    return d
+# def prefect_secrets_loader(*_) -> MutableMapping[str, Any]:
+#     logger = prefect.context.get("logger")
+#     d = defaultdict(dict)
+#     prefect_secrets = prefect.context.get("secrets", {})
+#     logger.info(prefect_secrets)
+#     logger.info(list(prefect.context.keys()))
+#     for secret_key, secret_value in prefect_secrets.items():
+#         app_name, config_section, config_attribute = secret_key.split("__")
+#         if app_name == "murkelhausen-data":
+#             d[config_section][config_attribute] = secret_value
+#     logger.info(d)
+#
+#     return d
 
 
 def user_toml_loader(settings: BaseSettings):

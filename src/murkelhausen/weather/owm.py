@@ -5,8 +5,6 @@ from logging import getLogger
 
 import requests
 from prefect import task
-from prefect.client import Secret
-import prefect
 
 from murkelhausen.config import WeatherOWM, City
 
@@ -20,9 +18,9 @@ def query_one_call_api(city: City, owm_settings: WeatherOWM) -> dict:
 
 
 @task
-def query_weather(city: City, owm_settings: WeatherOWM) -> dict:
+def query_weather(city: City, owm_settings: WeatherOWM, api_key: str) -> dict:
     return _query_owm(
-        owm_settings.url_weather, city, owm_settings.api_key, owm_settings.units
+        owm_settings.url_weather, city, api_key, owm_settings.units
     )
 
 
@@ -34,9 +32,6 @@ def _query_owm(url: str, city: City, api_key: str, units: str) -> dict:
         "units": units,
     }
     r = requests.get(url, params=query_params)
-    logger = prefect.context.get("logger")
-    logger.info(f'{Secret("foo").get()}')
-    logger.info(f'{Secret("murkelhausen-data__weather_owm__api_key").get()}')
 
     if r.status_code == 200:
         return_dict: dict = r.json()
