@@ -99,12 +99,15 @@ def default_toml_loader(settings: BaseSettings) -> MutableMapping[str, Any]:
 
 
 def prefect_secrets_loader(*_) -> MutableMapping[str, Any]:
+    logger = context.get("logger")
     d = defaultdict(dict)
     prefect_secrets = context.get("secrets", {})
+    logger.info(prefect_secrets)
     for secret_key, secret_value in prefect_secrets.items():
         app_name, config_section, config_attribute = secret_key.split("__")
         if app_name == "murkelhausen-data":
             d[config_section][config_attribute] = secret_value
+    logger.info(d)
 
     return d
 
