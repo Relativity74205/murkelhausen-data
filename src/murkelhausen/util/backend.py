@@ -20,7 +20,7 @@ def get_city_object(city_name: str) -> City:
         raise ValueError(f"{city_name=} not found in config.")
 
 
-@task
+@task(task_run_name="save_{base_name}_data")
 def save_json(base_name: str, data: dict):
     now = datetime.now().isoformat(timespec="seconds")
     base_path = Path(__file__).parent.parent.parent.parent / cfg.app.data_path

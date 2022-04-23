@@ -15,7 +15,14 @@ logger = prefect.context.get("logger")
 schedule = IntervalSchedule(interval=timedelta(minutes=10))
 
 
-with Flow("GetWeatherData", schedule=schedule) as flow:
+def set_run_name(flow, old_state, new_state):
+    if new_state.is_running():
+        client = prefect.Client()
+        name = f"{flow.name}-{prefect.context.date}"
+        client.set_flow_run_name(prefect.context.flow_run_id, name)
+
+
+with Flow("GetWeatherData", schedule=schedule, state_handlers=[set_run_name]) as flow:
     weather_owm__api_key = PrefectSecret("murkelhausendata__weather_owm__api_key")
     deconz__api_key = PrefectSecret("murkelhausendata__deconz__api_key")
     sensor_data = deconz.get_sensor_data(cfg.deconz, deconz__api_key)
