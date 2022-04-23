@@ -10,6 +10,13 @@
 3. create project `prefect create project 'murkelhausen'`
 4. register flow `python src/murkelhausen/pipeline.py`
 
+
+TODO:
+- change path in supervisord.conf
+- setup systemd for supervisord
+    - http://supervisord.org/running.html#running-supervisord-automatically-on-startup
+    - https://serverfault.com/questions/958625/error-when-adding-supervisord-to-run-via-systemd)
+
 ## ConBee II
 
 http://192.168.1.28/pwa/

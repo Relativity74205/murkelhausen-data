@@ -55,6 +55,12 @@ class S3(BaseModel, validate_assignment=True):
     aws_secret_access_key: str
 
 
+class Deconz(BaseModel, validate_assignment=True):
+    base_url: str
+    api_key: str
+    sensor_route: str
+
+
 class App(BaseModel):
     loglevel: loglevels
     data_path: str
@@ -74,6 +80,7 @@ class Settings(BaseSettings):
     weather_owm: WeatherOWM
     weather_nmi: WeatherNMI
     s3: S3
+    deconz: Deconz
 
     class Config:
         validate_assignment = True
