@@ -16,12 +16,7 @@ url_onecall = "http://api.openweathermap.org/data/2.5/onecall"
 url_compact = "https://api.met.no/weatherapi/locationforecast/2.0/compact"
 url_complete = "https://api.met.no/weatherapi/locationforecast/2.0/complete"
 
-[s3]
-bucket = "murkelhausen-weather"
-aws_access_key_id = "AKIAYNIWNYJNLYTLAPGG"
-aws_secret_access_key = ""
-
-[deconz]
-base_url = "http://192.168.1.28/api/"
-api_key = ""
-sensor_route = "/sensors/"
+[garmin_connect]
+email = "arkadius@schuchhardt.com"
+password = ""
+auth_token_path = "~/.garth"

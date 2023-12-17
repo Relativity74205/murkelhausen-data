@@ -20,6 +20,7 @@ pip-wheel-metadata
 
 # user config
 user.toml
+.env
 
 # prefect
 supervisord.pid

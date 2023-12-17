@@ -28,29 +28,17 @@ prefect run -p src/murkelhausen/pipeline.py
     - http://supervisord.org/running.html#running-supervisord-automatically-on-startup
     - https://serverfault.com/questions/958625/error-when-adding-supervisord-to-run-via-systemd)
 
-## ConBee II
 
-http://192.168.1.28/pwa/
+## Garmin Auth (Garth)
 
-###
+```python
+import garth
+from getpass import getpass
 
-### install
+email = input("Enter email address: ")
+password = getpass("Enter password: ")
+# If there's MFA, you'll be prompted during the login
+garth.login(email, password)
 
-- https://phoscon.de/en/conbee2/install
-- https://github.com/dresden-elektronik/deconz-rest-plugin#headless-support-for-linux
-
-### Rest API
-
-- https://dresden-elektronik.github.io/deconz-rest-doc/getting_started/#acquire-an-api-key
-- 192.168.1.28/api
-- API key: see onepassword
-
-
-### Phoscon App
-
-- https://phoscon.de/en/app/doc
-
-### Forum Posts
-
-- https://forum.fhem.de/index.php?topic=117470.0
-
+garth.save("~/.garth")
+```
