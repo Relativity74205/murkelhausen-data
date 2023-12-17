@@ -1,14 +1,14 @@
 from datetime import timedelta
 
-from prefect import Flow
 import prefect
+from prefect import Flow
 from prefect.schedules import IntervalSchedule
 from prefect.tasks.secrets import PrefectSecret
 
+from murkelhausen import config
 from murkelhausen.home import deconz
-from murkelhausen.weather import nmi, owm
 from murkelhausen.util import backend
-from murkelhausen import cfg
+from murkelhausen.weather import nmi, owm
 
 logger = prefect.context.get("logger")
 

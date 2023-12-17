@@ -1,10 +1,14 @@
+import importlib.resources
 import tomllib
 from logging import getLogger
-from typing import Literal, Any, Type, Callable
-import importlib.resources
+from typing import Any, Callable, Literal, Type
 
 from pydantic import BaseModel
-from pydantic_settings import BaseSettings, SettingsConfigDict, PydanticBaseSettingsSource
+from pydantic_settings import (
+    BaseSettings,
+    PydanticBaseSettingsSource,
+    SettingsConfigDict,
+)
 
 log = getLogger(__name__)
 
@@ -39,6 +43,8 @@ class App(BaseModel):
     loglevel: loglevels
     data_path: str
     cities: list[City]
+    confluent_broker_url: str
+    confluent_schema_registry_url: str
 
 
 class Settings(BaseSettings):
@@ -47,7 +53,9 @@ class Settings(BaseSettings):
     weather_nmi: WeatherNMI
     garmin_connect: GarminConnect
 
-    model_config = SettingsConfigDict(env_prefix='MURKELHAUSEN_', env_nested_delimiter="__")
+    model_config = SettingsConfigDict(
+        env_prefix="MURKELHAUSEN_", env_nested_delimiter="__"
+    )
 
     @classmethod
     def settings_customise_sources(
@@ -68,7 +76,9 @@ class Settings(BaseSettings):
 
 def default_settings_fetcher() -> Callable[..., dict[str, Any]]:
     def inner(*_):
-        with (importlib.resources.files("murkelhausen") / "default.toml").open("rb") as f:
+        with (importlib.resources.files("murkelhausen") / "default.toml").open(
+            "rb"
+        ) as f:
             return tomllib.load(f)
 
     return inner

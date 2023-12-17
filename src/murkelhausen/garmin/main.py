@@ -1,8 +1,9 @@
-from datetime import date
 import json
-from garminconnect import Garmin
+from datetime import date
+
 import garth
 from dateutil.relativedelta import relativedelta
+from garminconnect import Garmin
 
 from murkelhausen.config import config
 

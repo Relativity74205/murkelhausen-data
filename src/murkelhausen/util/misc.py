@@ -4,9 +4,8 @@ Anything that was declared here should be of a very general purpose and not
 tied to this codebase in particular.
 """
 
-from typing import Callable, Any, TypeVar, cast
 from functools import wraps
-
+from typing import Any, Callable, TypeVar, cast
 
 #: **Function-type identifier** - By asserting to mypy that a decorator only ever consumes
 #: functions, the wrapped function will keep its original signature.

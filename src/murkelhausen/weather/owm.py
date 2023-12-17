@@ -6,7 +6,7 @@ from logging import getLogger
 import requests
 from prefect import task
 
-from murkelhausen.config import WeatherOWM, City
+from murkelhausen.config import City, WeatherOWM
 
 log = getLogger(__name__)
 

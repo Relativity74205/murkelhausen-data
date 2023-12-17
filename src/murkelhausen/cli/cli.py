@@ -3,10 +3,10 @@ from logging import getLogger
 import click
 
 from murkelhausen import __version__, cfg
-from murkelhausen.config import cli_loader, City
-from murkelhausen.util import logger, backend
+from murkelhausen.config import City, cli_loader
+from murkelhausen.util import backend, logger
 from murkelhausen.util.backend import save_json
-from murkelhausen.weather import owm, nmi
+from murkelhausen.weather import nmi, owm
 
 log = getLogger(__name__)
 

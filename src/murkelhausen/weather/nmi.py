@@ -4,11 +4,11 @@ https://www.yr.no/en/details/table/2-6553027/Germany/North%20Rhine-Westphalia/D%
 """
 from logging import getLogger
 
+import prefect
 import requests
 from prefect import task
-import prefect
 
-from murkelhausen.config import WeatherNMI, City
+from murkelhausen.config import City, WeatherNMI
 
 log = getLogger(__name__)
 

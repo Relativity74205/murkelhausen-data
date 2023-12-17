@@ -1,7 +1,7 @@
 import logging
 from logging.config import dictConfig
 
-from murkelhausen import cfg
+from murkelhausen.config import config
 from murkelhausen.util.misc import run_once
 
 log = logging.getLogger(__name__)
@@ -21,7 +21,7 @@ def setup_logging():
             },
             "handlers": {
                 "console": {
-                    "level": cfg.app.loglevel,
+                    "level": config.app.loglevel,
                     "formatter": "oneline",
                     "class": "logging.StreamHandler",
                     "stream": "ext://sys.stdout",
@@ -30,12 +30,12 @@ def setup_logging():
             "loggers": {
                 "": {
                     "handlers": ["console"],
-                    "level": cfg.app.loglevel,
+                    "level": config.app.loglevel,
                     "propagate": True,
                 },
                 "uvicorn": {
                     "handlers": ["console"],
-                    "level": cfg.app.loglevel,
+                    "level": config.app.loglevel,
                     "propagate": False,
                 },
             },
