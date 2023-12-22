@@ -1,12 +1,17 @@
 [app]
 loglevel = "DEBUG"
-data_path = "data"
-confluent_broker_url = "192.168.1.69:19092"
-confluent_schema_registry_url = "http://192.168.1.69:8081"
 [[app.cities]]
     name = "Mülheim"
     gps_lat = 51.418568
     gps_lon = 6.884523
+
+[database]
+host = "192.168.1.69"
+port = 5432
+username = "murkelhausen_data"
+password = ""
+database = "murkelhausen_datastore"
+database_schema = "data"
 
 [weather_owm]
 units = "metric"

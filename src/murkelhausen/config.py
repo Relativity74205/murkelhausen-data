@@ -3,7 +3,7 @@ import tomllib
 from logging import getLogger
 from typing import Any, Callable, Literal, Type
 
-from pydantic import BaseModel
+from pydantic import BaseModel, SecretStr
 from pydantic_settings import (
     BaseSettings,
     PydanticBaseSettingsSource,
@@ -35,20 +35,27 @@ class WeatherNMI(BaseModel, validate_assignment=True):
 
 class GarminConnect(BaseModel, validate_assignment=True):
     email: str
-    password: str
+    password: SecretStr
     auth_token_path: str
+
+
+class Database(BaseModel, validate_assignment=True):
+    host: str
+    port: int
+    username: str
+    password: SecretStr
+    database: str
+    database_schema: str
 
 
 class App(BaseModel):
     loglevel: loglevels
-    data_path: str
     cities: list[City]
-    confluent_broker_url: str
-    confluent_schema_registry_url: str
 
 
 class Settings(BaseSettings):
     app: App
+    database: Database
     weather_owm: WeatherOWM
     weather_nmi: WeatherNMI
     garmin_connect: GarminConnect

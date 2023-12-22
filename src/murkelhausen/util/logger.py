@@ -33,11 +33,6 @@ def setup_logging():
                     "level": config.app.loglevel,
                     "propagate": True,
                 },
-                "uvicorn": {
-                    "handlers": ["console"],
-                    "level": config.app.loglevel,
-                    "propagate": False,
-                },
             },
         }
     )

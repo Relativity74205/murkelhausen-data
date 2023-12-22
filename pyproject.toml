@@ -4,6 +4,9 @@ version = "0.1.0"
 description = ""
 authors = ["Relativity74205 <arkadius@schuchhardt.com>"]
 
+[tool.poetry.scripts]
+murkelhausen = "murkelhausen.cli.cli:cli"
+
 [tool.poetry.dependencies]
 python = "^3.11"
 #prefect = "^1.2.0"
@@ -14,6 +17,8 @@ garminconnect = "^0.2.11"
 python-dateutil = "^2.8.2"
 confluent-kafka = "^2.3.0"
 dataclasses-avroschema = "^0.54.2"
+sqlalchemy = "^2.0.23"
+psycopg = {version = "^3.1.16", extras = ["binary", "pool"]}
 
 [tool.poetry.dev-dependencies]
 #mypy = "^0.931"
