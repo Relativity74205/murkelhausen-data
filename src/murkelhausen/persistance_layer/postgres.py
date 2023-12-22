@@ -8,6 +8,7 @@ from sqlalchemy.orm import (
     DeclarativeBase,
     Mapped,
     mapped_column,
+    registry,
 )
 
 from murkelhausen.config import config
@@ -17,25 +18,6 @@ log = logging.getLogger(__name__)
 
 class Base(MappedAsDataclass, DeclarativeBase):
     """subclasses will be converted to dataclasses"""
-
-
-class HeartRateDailyStats(Base):
-    __tablename__ = "heart_rate_daily"
-
-    id: Mapped[int] = mapped_column(init=False, primary_key=True)
-    measure_date: Mapped[date]
-    resting_heart_rate: Mapped[int]
-    min_heart_rate: Mapped[int]
-    max_heart_rate: Mapped[int]
-    last_seven_days_avg_resting_heart_rate: Mapped[int]
-
-
-class HeartRate(Base):
-    __tablename__ = "heart_rate"
-
-    id: Mapped[int] = mapped_column(init=False, primary_key=True)
-    tstamp: Mapped[datetime]
-    heart_rate: Mapped[int]
 
 
 def get_engine():
@@ -59,9 +41,6 @@ def get_engine():
 
 def create_tables():
     engine = get_engine()
-    # with Session(engine) as session:
-    #     session.execute(text("CREATE TABLE data.foo (a int)"))
-    #     session.commit()
     Base.metadata.create_all(engine)
 
 

@@ -1,12 +1,17 @@
+from datetime import date
 from logging import getLogger
 
 import click
 
 from murkelhausen import __version__
+from murkelhausen.garmin.main import get_garmin_client
 from murkelhausen.util import logger
 from murkelhausen.persistance_layer import postgres
+from murkelhausen.garmin.functions import get_heart_rates
 
 log = getLogger(__name__)
+
+garmin_client = get_garmin_client()
 
 
 @click.group(invoke_without_command=True)
@@ -45,7 +50,7 @@ def query_nmi(city_name: str):
     # nmi_data = nmi.query_locationforecast(city, config.weather_nmi)
 
 
-@cli.group("db")
+@cli.group
 def db():
     ...
 
@@ -53,3 +58,17 @@ def db():
 @db.command("create")
 def create_db():
     postgres.create_tables()
+
+
+@cli.group
+def garmin():
+    ...
+
+
+@garmin.command("get-heart-rates")
+def get_heart_rates_command():
+    heart_rates_daily, heart_rates = get_heart_rates(garmin_client, date.today())
+    print(heart_rates_daily)
+    print(heart_rates)
+    postgres.save_objects([heart_rates_daily])
+    postgres.save_objects(heart_rates)
