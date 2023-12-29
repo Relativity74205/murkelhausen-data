@@ -1,16 +1,17 @@
-from datetime import date
+from datetime import date, datetime
 from logging import getLogger
 
 import click
+from dateutil.relativedelta import relativedelta
 
 from murkelhausen import __version__
-from murkelhausen.garmin.main import get_garmin_client, get_heartrate_data
+from murkelhausen import garmin
 from murkelhausen.util import logger
 from murkelhausen import persistance_layer
 
 log = getLogger(__name__)
 
-garmin_client = get_garmin_client()
+garmin_client = garmin.get_garmin_client()
 
 
 @click.group(invoke_without_command=True)
@@ -59,14 +60,36 @@ def create_db():
     persistance_layer.create_tables()
 
 
-@cli.group
-def garmin():
+@cli.group("garmin")
+def garmin_group():
     ...
 
 
-@garmin.command("get-heart-rates")
-def get_heart_rates_command():
-    get_heartrate_data(start_date=date.today(), logger=log)
+@garmin_group.command("get-auth-token")
+def auth_token():
+    garmin.get_auth_token()
+
+
+@garmin_group.command("get-heart-rates")
+@click.argument(
+    "start_date",
+    type=click.DateTime(formats=["%Y-%m-%d"]),
+    required=False,
+    default=str(date.today()),
+)
+@click.argument(
+    "end_date",
+    type=click.DateTime(formats=["%Y-%m-%d"]),
+    required=False,
+    default=str(date.today()),
+)
+def get_heart_rates_command(start_date: datetime, end_date: datetime):
+    start_date = start_date.date()
+    end_date = end_date.date()
+
+    log.info(f"Started heart rate data command for {start_date=} and {end_date=}.")
+
+    garmin.get_heartrate_data(start_date=start_date, end_date=end_date, logger=log)
 
 
 @cli.group
@@ -83,11 +106,14 @@ def deploy_flow():
     #     source="/home/arkadius/dev/murkelhausen-data",
     #     entrypoint="src/murkelhausen/flow.py:flow",
     # ).
-    main_flow.deploy(
+    main_flow.from_source(
+        source="git@github.com:Relativity74205/murkelhausen-data.git",
+        entrypoint="src/murkelhausen/flow.py:main_flow",
+    ).deploy(
         name="murkelhausen_flow",
         work_pool_name="beowulf-local",  # TODO make configurable
         cron="0 2 * * *",
-        version=__version__,  # TODO add version to murkelhausen-data
-        build=False,
-        push=False,
+        # version=__version__,  # TODO add version to murkelhausen-data
+        # build=False,
+        # push=False,
     )

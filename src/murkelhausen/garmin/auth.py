@@ -4,7 +4,7 @@ from murkelhausen.config import config
 
 
 def get_auth_token():
-    email = config.garmin_connect.username
+    email = config.garmin_connect.email
     password = config.garmin_connect.password.get_secret_value()
 
     garth.login(email, password)

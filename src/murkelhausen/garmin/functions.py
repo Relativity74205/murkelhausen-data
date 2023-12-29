@@ -13,10 +13,10 @@ class HeartRateDailyStats(Base):
     __tablename__ = "heart_rate_daily"
 
     measure_date: Mapped[date] = mapped_column(primary_key=True)
-    resting_heart_rate: Mapped[int]
-    min_heart_rate: Mapped[int]
-    max_heart_rate: Mapped[int]
-    last_seven_days_avg_resting_heart_rate: Mapped[int]
+    resting_heart_rate: Mapped[int | None]
+    min_heart_rate: Mapped[int | None]
+    max_heart_rate: Mapped[int | None]
+    last_seven_days_avg_resting_heart_rate: Mapped[int | None]
 
 
 class HeartRate(Base):
@@ -37,11 +37,15 @@ def _get_heart_rates(
         max_heart_rate=data["maxHeartRate"],
         last_seven_days_avg_resting_heart_rate=data["lastSevenDaysAvgRestingHeartRate"],
     )
-    heart_rates = tuple(
-        HeartRate(
-            tstamp=datetime.fromtimestamp(d[0] / 1000),
-            heart_rate=d[1],
+    if data["heartRateValues"] is not None:
+        heart_rates = tuple(
+            HeartRate(
+                tstamp=datetime.fromtimestamp(d[0] / 1000),
+                heart_rate=d[1],
+            )
+            for d in data["heartRateValues"]
         )
-        for d in data["heartRateValues"]
-    )
+    else:
+        heart_rates = tuple()
+
     return heart_rates_daily, heart_rates

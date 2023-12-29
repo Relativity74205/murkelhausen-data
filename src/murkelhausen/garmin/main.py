@@ -1,26 +1,18 @@
 from datetime import date, timedelta
 
-import garth
 from garminconnect import Garmin
 
 from murkelhausen.config import config
+from murkelhausen.garmin.auth import get_auth_token
 from murkelhausen.garmin.functions import _get_heart_rates
 from murkelhausen.persistance_layer import save_objects
-
-
-def get_auth_token():
-    email = config.garmin_connect.email
-    password = config.garmin_connect.password
-
-    garth.login(email, password)
-    garth.save(config.garmin_connect.auth_token_path)
 
 
 def get_garmin_client() -> Garmin:
     garmin = Garmin()
     try:
         garmin.login(config.garmin_connect.auth_token_path)
-    except:
+    except FileNotFoundError:
         get_auth_token()
         garmin.login(config.garmin_connect.auth_token_path)
     return garmin

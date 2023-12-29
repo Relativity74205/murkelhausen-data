@@ -1,2 +1,2 @@
 - [] replace supervisorctl with systemd (https://docs.prefect.io/latest/guides/deployment/daemonize/)
-- 
+- [] deployment from github
