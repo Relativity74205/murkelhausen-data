@@ -56,5 +56,6 @@ ALTER SCHEMA data OWNER TO murkelhausen_data;
 ## Prefect
 
 ```sql
-prefect work-pool create local --type process
+prefect work-pool create beowulf-local --type process
+prefect worker start --pool beowulf-local
 ```

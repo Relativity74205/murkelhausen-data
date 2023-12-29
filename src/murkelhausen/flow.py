@@ -18,4 +18,8 @@ if __name__ == "__main__":
     #     work_pool_name="my-managed-pool",  # TODO
     #     cron="0 1 * * *",
     # )
-    main_flow()
+    main_flow.serve(
+        name="murkelhausen_flow",
+        cron="0 2 * * *",
+        # version=__version__,  # TODO add version to murkelhausen-data
+    )

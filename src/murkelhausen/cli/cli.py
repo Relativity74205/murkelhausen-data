@@ -67,3 +67,27 @@ def garmin():
 @garmin.command("get-heart-rates")
 def get_heart_rates_command():
     get_heartrate_data(start_date=date.today(), logger=log)
+
+
+@cli.group
+def flow():
+    ...
+
+
+@flow.command("deploy")
+def deploy_flow():
+    from murkelhausen.flow import main_flow
+
+    # main_flow.from_source(
+    #     # source="/home/beowulf/murkelhausen-data",
+    #     source="/home/arkadius/dev/murkelhausen-data",
+    #     entrypoint="src/murkelhausen/flow.py:flow",
+    # ).
+    main_flow.deploy(
+        name="murkelhausen_flow",
+        work_pool_name="beowulf-local",  # TODO make configurable
+        cron="0 2 * * *",
+        version=__version__,  # TODO add version to murkelhausen-data
+        build=False,
+        push=False,
+    )
