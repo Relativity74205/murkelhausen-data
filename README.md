@@ -44,10 +44,17 @@ garth.save("~/.garth")
 ```
 
 
-### Postgres DB
+## Postgres DB
 
 ```sql
 CREATE SCHEMA data;
 CREATE USER murkelhausen_data WITH PASSWORD '';
 ALTER SCHEMA data OWNER TO murkelhausen_data;
+```
+
+
+## Prefect
+
+```sql
+prefect work-pool create local --type process
 ```

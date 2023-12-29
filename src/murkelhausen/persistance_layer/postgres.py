@@ -1,6 +1,8 @@
 import logging
 from datetime import datetime, date
+from typing import Iterable
 
+from pydantic import BaseModel
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import (
     Session,
@@ -32,7 +34,7 @@ def get_engine():
     )
     engine = create_engine(
         connection_string,
-        echo=True,
+        echo=False,  # TODO make configurable in config
         connect_args={"options": f"-csearch_path={schema}"},
     )
 
@@ -44,8 +46,13 @@ def create_tables():
     Base.metadata.create_all(engine)
 
 
-def save_objects(objects):
+def save_objects(objects: Iterable[Base], upsert: bool = True):
+    # TODO: replace with ID check, that is: compare timestamps in objects with timestamps in database; https://stackoverflow.com/a/26018934
     engine = get_engine()
     with Session(engine) as session:
-        session.add_all(objects)
+        if upsert:
+            for o in objects:
+                session.merge(o)
+        else:
+            session.add_all(objects)
         session.commit()

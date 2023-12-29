@@ -12,8 +12,7 @@ log = logging.getLogger(__name__)
 class HeartRateDailyStats(Base):
     __tablename__ = "heart_rate_daily"
 
-    id: Mapped[int] = mapped_column(init=False, primary_key=True)
-    measure_date: Mapped[date]
+    measure_date: Mapped[date] = mapped_column(primary_key=True)
     resting_heart_rate: Mapped[int]
     min_heart_rate: Mapped[int]
     max_heart_rate: Mapped[int]
@@ -23,16 +22,14 @@ class HeartRateDailyStats(Base):
 class HeartRate(Base):
     __tablename__ = "heart_rate"
 
-    id: Mapped[int] = mapped_column(init=False, primary_key=True)
-    tstamp: Mapped[datetime]
+    tstamp: Mapped[datetime] = mapped_column(primary_key=True)
     heart_rate: Mapped[int] = mapped_column(nullable=True)
 
 
-def get_heart_rates(
+def _get_heart_rates(
     garmin: Garmin, measure_date: date
 ) -> tuple[HeartRateDailyStats, tuple[HeartRate, ...]]:
     data = garmin.get_heart_rates(measure_date)
-    # log.debug(f"{data=}")
     heart_rates_daily = HeartRateDailyStats(
         measure_date=measure_date,
         resting_heart_rate=data["restingHeartRate"],
