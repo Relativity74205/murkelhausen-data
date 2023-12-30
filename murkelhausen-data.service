@@ -4,7 +4,7 @@ Description=Prefect serve
 [Service]
 User=prefect
 WorkingDirectory=/home/arkadius/murkelhausen-data
-ExecStart=/home/arkadius/murkelhausen-data/.venv/bin/python foo.py
+ExecStart=/home/arkadius/murkelhausen-data/.venv/bin/python flow.py
 Restart=always
 
 [Install]
