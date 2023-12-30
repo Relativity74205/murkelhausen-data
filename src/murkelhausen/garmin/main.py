@@ -18,12 +18,8 @@ def get_garmin_client() -> Garmin:
     return garmin
 
 
-def get_heartrate_data(
-    *, start_date: date, end_date: date | None = None, logger
-) -> None:
+def get_heartrate_data(*, start_date: date, end_date: date, logger) -> None:
     garmin_client = get_garmin_client()
-    if end_date is None:
-        end_date = start_date
 
     logger.info(f"Getting heart rate data from {start_date} to {end_date}.")
 

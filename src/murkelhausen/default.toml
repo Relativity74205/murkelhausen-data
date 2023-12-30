@@ -1,5 +1,6 @@
 [app]
 loglevel = "DEBUG"
+prefect_secret_block_name = "murkelhausen-secrets"
 [[app.cities]]
     name = "Mülheim"
     gps_lat = 51.418568

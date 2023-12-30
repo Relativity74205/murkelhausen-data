@@ -1,2 +1,5 @@
 - [] replace supervisorctl with systemd (https://docs.prefect.io/latest/guides/deployment/daemonize/)
-- [] deployment from github
+- [] prefect start with code from github
+  - [x] what to do with secrets, currently they are in a local env var, PrefectSecret?
+- [] prefect starts container
+- [] add Artifacts

@@ -1,20 +1,41 @@
 from datetime import date
 
-from dateutil.relativedelta import relativedelta
-from prefect import flow
+from prefect import flow, get_run_logger, task
 
+from murkelhausen.config import config
 from murkelhausen.garmin_flow import garmin_flow
+from murkelhausen.prefect_secret_block import MurkelHausenSecrets
 from murkelhausen.util.logger import setup_logging
 
 setup_logging()
 
 
+@task
+def get_secrets():
+    logger = get_run_logger()
+    logger.info("Getting secrets.")
+    murkelhausen_secrets_block = MurkelHausenSecrets.load(
+        config.app.prefect_secret_block_name
+    )
+    config.database.password = (
+        murkelhausen_secrets_block.database_password.get_secret_value()
+    )
+    config.garmin_connect.password = (
+        murkelhausen_secrets_block.garmin_password.get_secret_value()
+    )
+    logger.info("Finished getting secrets.")
+
+
 @flow
-def main_flow(measure_date: date = date.today() - relativedelta(days=1)):
-    """
-    Default measure date is always yesterday (which timezone?), except when a measure_date is specified.
-    """
-    garmin_flow(measure_date=measure_date)
+def main_flow(
+    start_date: date | None = None,
+    end_date: date | None = None,
+):
+    get_secrets()
+    logger = get_run_logger()
+    logger.info("Starting Garmin main flow.")
+    garmin_flow(start_date=start_date, end_date=end_date)
+    logger.info("Finished Garmin main flow.")
 
 
 if __name__ == "__main__":

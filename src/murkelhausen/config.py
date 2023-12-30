@@ -1,9 +1,9 @@
 import importlib.resources
 import tomllib
 from logging import getLogger
-from typing import Any, Callable, Literal, Type
+from typing import Any, Callable, Literal, Type, Optional
 
-from pydantic import BaseModel, SecretStr
+from pydantic import BaseModel, SecretStr, ConfigDict
 from pydantic_settings import (
     BaseSettings,
     PydanticBaseSettingsSource,
@@ -50,6 +50,7 @@ class Database(BaseModel, validate_assignment=True):
 
 class App(BaseModel):
     loglevel: loglevels
+    prefect_secret_block_name: str
     cities: list[City]
 
 

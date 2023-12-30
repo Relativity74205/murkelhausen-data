@@ -2,10 +2,10 @@ from datetime import date, datetime
 from logging import getLogger
 
 import click
-from dateutil.relativedelta import relativedelta
 
 from murkelhausen import __version__
 from murkelhausen import garmin
+from murkelhausen.prefect_secret_block import create_prefect_secrets_block
 from murkelhausen.util import logger
 from murkelhausen import persistance_layer
 
@@ -81,11 +81,13 @@ def auth_token():
     "end_date",
     type=click.DateTime(formats=["%Y-%m-%d"]),
     required=False,
-    default=str(date.today()),
 )
-def get_heart_rates_command(start_date: datetime, end_date: datetime):
+def get_heart_rates_command(start_date: datetime, end_date: datetime | None):
     start_date = start_date.date()
-    end_date = end_date.date()
+    if end_date is None:
+        end_date = start_date
+    else:
+        end_date = end_date.date()
 
     log.info(f"Started heart rate data command for {start_date=} and {end_date=}.")
 
@@ -93,27 +95,35 @@ def get_heart_rates_command(start_date: datetime, end_date: datetime):
 
 
 @cli.group
-def flow():
+def prefect():
     ...
 
 
-@flow.command("deploy")
-def deploy_flow():
-    from murkelhausen.flow import main_flow
+@prefect.command("create-block")
+def create_block():
+    log.info("Creating prefect secrets block.")
+    create_prefect_secrets_block()
+    log.info("Finished creating prefect secrets block.")
 
-    # main_flow.from_source(
-    #     # source="/home/beowulf/murkelhausen-data",
-    #     source="/home/arkadius/dev/murkelhausen-data",
-    #     entrypoint="src/murkelhausen/flow.py:flow",
-    # ).
-    main_flow.from_source(
-        source="git@github.com:Relativity74205/murkelhausen-data.git",
-        entrypoint="src/murkelhausen/flow.py:main_flow",
-    ).deploy(
-        name="murkelhausen_flow",
-        work_pool_name="beowulf-local",  # TODO make configurable
-        cron="0 2 * * *",
-        # version=__version__,  # TODO add version to murkelhausen-data
-        # build=False,
-        # push=False,
-    )
+
+# TODO add flow deploy command
+# @flow.command("deploy")
+# def deploy_flow():
+#     from murkelhausen.flow import main_flow
+#
+#     # main_flow.from_source(
+#     #     # source="/home/beowulf/murkelhausen-data",
+#     #     source="/home/arkadius/dev/murkelhausen-data",
+#     #     entrypoint="src/murkelhausen/flow.py:flow",
+#     # ).
+#     main_flow.from_source(
+#         source="git@github.com:Relativity74205/murkelhausen-data.git",
+#         entrypoint="src/murkelhausen/flow.py:main_flow",
+#     ).deploy(
+#         name="murkelhausen_flow",
+#         work_pool_name="beowulf-local",  # TODO make configurable
+#         cron="0 2 * * *",
+#         # version=__version__,  # TODO add version to murkelhausen-data
+#         # build=False,
+#         # push=False,
+#     )
