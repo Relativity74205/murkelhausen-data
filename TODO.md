@@ -7,4 +7,8 @@
 - [] add Artifacts
 - [] names of flow runs
 - [x] poetry env on beowulf in directory
-- [ ] why does prefect uses internally pydantic v1? this has the consequence for `from pydantic.v1 import SecretStr` in src/murkelhausen/pipeline.py
+- [] why does prefect uses internally pydantic v1? this has the consequence for `from pydantic.v1 import SecretStr` in src/murkelhausen/pipeline.py
+- [x] integrate email notification
+  - is done through the user interface with automations and email block 
+- [] create python script to create above automations and email block through API
+  - https://app.prefect.cloud/api/docs?deviceId=d3c38c62-be25-406e-985e-30dd5845c1a3#tag/Automations

@@ -63,8 +63,30 @@ prefect worker start --pool beowulf-local
 
 ## Beowulf Setup
 
+
+### Setup systemd
+
 ```bash
 sudo ln -s /home/arkadius/murkelhausen-data/murkelhausen-data.service /etc/systemd/system/murkelhausen-data.service
 sudo systemctl daemon-reload
 sudo systemctl enable murkelhausen-data
+sudo systemctl start murkelhausen-data
+```
+
+### Changes to systemd files (also flow.py?)
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl restart murkelhausen-data
+```
+
+### Systemd Status
+
+```bash
+sudo systemctl status murkelhausen-data
+```
+
+#### systemd Logs
+```bash
+journalctl -u murkelhausen-data.service --follow
 ```
