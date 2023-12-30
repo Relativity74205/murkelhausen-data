@@ -10,7 +10,6 @@ class MurkelHausenSecrets(Block):
 
 
 def create_prefect_secrets_block():
-    print(config)
     secrets = MurkelHausenSecrets(
         garmin_password=config.garmin_connect.password.get_secret_value(),
         database_password=config.database.password.get_secret_value(),
