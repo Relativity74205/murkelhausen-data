@@ -1,0 +1,11 @@
+[Unit]
+Description=Prefect serve
+
+[Service]
+User=prefect
+WorkingDirectory=/home/arkadius/murkelhausen-data
+ExecStart=/home/arkadius/murkelhausen-data/.venv/bin/python foo.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

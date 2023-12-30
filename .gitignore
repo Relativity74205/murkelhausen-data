@@ -28,3 +28,6 @@ supervisord.log
 
 # data folders
 data
+
+# virtualenv
+.venv

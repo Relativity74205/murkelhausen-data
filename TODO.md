@@ -5,3 +5,5 @@
   - https://docs.prefect.io/2.10.21/guides/deployment/docker/
   - https://prefecthq.github.io/prefect-docker/
 - [] add Artifacts
+- [] names of flow runs
+- [x] poetry env on beowulf in directory
