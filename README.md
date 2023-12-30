@@ -59,3 +59,12 @@ ALTER SCHEMA data OWNER TO murkelhausen_data;
 prefect work-pool create beowulf-local --type process
 prefect worker start --pool beowulf-local
 ```
+
+
+## Beowulf Setup
+
+```bash
+sudo ln -s /home/arkadius/murkelhausen-data/murkelhausen-data.service /etc/systemd/system/murkelhausen-data.service
+sudo systemctl daemon-reload
+sudo systemctl enable murkelhausen-data
+```

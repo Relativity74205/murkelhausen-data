@@ -1,8 +1,8 @@
 [Unit]
-Description=Prefect serve
+Description=Prefect serves murkelhausen-data flow
 
 [Service]
-User=prefect
+User=arkadius
 WorkingDirectory=/home/arkadius/murkelhausen-data
 ExecStart=/home/arkadius/murkelhausen-data/.venv/bin/python flow.py
 Restart=always

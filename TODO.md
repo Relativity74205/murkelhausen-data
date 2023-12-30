@@ -7,3 +7,4 @@
 - [] add Artifacts
 - [] names of flow runs
 - [x] poetry env on beowulf in directory
+- [ ] why does prefect uses internally pydantic v1? this has the consequence for `from pydantic.v1 import SecretStr` in src/murkelhausen/pipeline.py
