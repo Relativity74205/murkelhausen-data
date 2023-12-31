@@ -1,6 +1,7 @@
-from datetime import date
+from datetime import date, timedelta, datetime
 
 from prefect import flow, get_run_logger, task
+from prefect.client.schemas.schedules import IntervalSchedule
 
 from murkelhausen.config import config
 from murkelhausen.garmin_flow import garmin_flow
@@ -42,6 +43,10 @@ if __name__ == "__main__":
     # replace with flow.from_source https://docs.prefect.io/latest/getting-started/quickstart/#step-4-make-your-code-schedulable
     main_flow.serve(
         name="murkelhausen_flow",
-        cron="0 2 * * *",  # add to config; check for timezone
+        schedule=IntervalSchedule(
+            interval=timedelta(hours=1),
+            anchor_date=datetime(2023, 12, 1, 0),
+            timezone="Europe/Berlin",
+        )
         # version=__version__,  # TODO add version to murkelhausen-data
     )

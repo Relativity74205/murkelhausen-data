@@ -2,6 +2,7 @@ from datetime import date, datetime
 from logging import getLogger
 
 import click
+from dateutil.relativedelta import relativedelta
 
 from murkelhausen import __version__
 from murkelhausen import garmin
@@ -10,8 +11,6 @@ from murkelhausen.util import logger
 from murkelhausen import persistance_layer
 
 log = getLogger(__name__)
-
-garmin_client = garmin.get_garmin_client()
 
 
 @click.group(invoke_without_command=True)
@@ -83,6 +82,8 @@ def auth_token():
     required=False,
 )
 def get_heart_rates_command(start_date: datetime, end_date: datetime | None):
+    garmin_client = garmin.get_garmin_client()
+
     start_date = start_date.date()
     if end_date is None:
         end_date = start_date
@@ -90,8 +91,11 @@ def get_heart_rates_command(start_date: datetime, end_date: datetime | None):
         end_date = end_date.date()
 
     log.info(f"Started heart rate data command for {start_date=} and {end_date=}.")
-
-    garmin.get_heartrate_data(start_date=start_date, end_date=end_date, logger=log)
+    for count_dates in range((end_date - start_date).days + 1):
+        measure_date = start_date + relativedelta(days=count_dates)
+        garmin.get_heartrate_data(
+            measure_date=measure_date, garmin_client=garmin_client, logger=log
+        )
 
 
 @cli.group
