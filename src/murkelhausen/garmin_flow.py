@@ -3,14 +3,29 @@ from datetime import date
 from dateutil.relativedelta import relativedelta
 from garminconnect import Garmin
 from prefect import flow, task, get_run_logger
+from prefect.runtime import flow_run
 from prefect.task_runners import ConcurrentTaskRunner
 
 from murkelhausen import garmin
 
 
+def _generate_flowrun_name():
+    parameters = flow_run.parameters
+    start_date = parameters["start_date"]
+    end_date = parameters["end_date"]
+    flowrun_name = "garmin-flow"
+    if start_date is not None:
+        flowrun_name += f"_{start_date}"
+    if end_date is not None:
+        flowrun_name += f"_{end_date}"
+    if start_date is None and end_date is None:
+        flowrun_name += "_default"
+    return flowrun_name
+
+
 @flow(
     task_runner=ConcurrentTaskRunner(),
-    flow_run_name="garmin-flow_{start_date}_{end_date}",
+    flow_run_name=_generate_flowrun_name,
 )
 def garmin_flow(start_date: date | None = None, end_date: date | None = None):
     """
