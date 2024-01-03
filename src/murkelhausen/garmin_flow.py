@@ -47,9 +47,7 @@ def garmin_flow(start_date: date | None = None, end_date: date | None = None):
     logger.info(f"Starting heart rate data task(s).")
     for count_dates in range((end_date - start_date).days + 1):
         measure_date = start_date + relativedelta(days=count_dates)
-        heart_rate_data(
-            measure_date=measure_date, garmin_client=garmin_client
-        )  # .submit()
+        heart_rate_data(measure_date=measure_date, garmin_client=garmin_client)
 
 
 @task(task_run_name="garmin_client")
