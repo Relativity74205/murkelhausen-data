@@ -24,13 +24,15 @@ def _generate_flowrun_name():
 
 
 @flow(
-    task_runner=ConcurrentTaskRunner(),
+    task_runner=ConcurrentTaskRunner(),  # TODO test DaskRunner (https://prefecthq.github.io/prefect-dask/)
     flow_run_name=_generate_flowrun_name,
 )
 def garmin_flow(start_date: date | None = None, end_date: date | None = None):
     """
     Default start date is always yesterday and end date is today,
     except when custom dates are specified.
+
+
     """
     logger = get_run_logger()
     if start_date is None:
