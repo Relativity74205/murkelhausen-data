@@ -5,7 +5,7 @@ Description=Prefect serves murkelhausen-data flow
 User=arkadius
 WorkingDirectory=/home/arkadius/murkelhausen-data
 ExecStart=/home/arkadius/murkelhausen-data/.venv/bin/python flow.py
-Environment=PREFECT_LOGGING_LEVEL=DEBUG
+#Environment=PREFECT_LOGGING_LEVEL=DEBUG
 Restart=always
 
 [Install]
