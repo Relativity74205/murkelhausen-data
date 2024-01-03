@@ -11,10 +11,13 @@ from murkelhausen.util.logger import setup_logging
 setup_logging()
 
 
+def _generate_flowrun_name():
+    now = datetime.now()
+    return f"murkelhausen-data-main_{now.year}-{now.month}-{now.day}-{now.hour}"
+
+
 @task
 def get_secrets():
-    logger = get_run_logger()
-    logger.info("Getting secrets.")
     murkelhausen_secrets_block = MurkelHausenSecrets.load(
         config.app.prefect_secret_block_name
     )
@@ -24,23 +27,20 @@ def get_secrets():
     config.garmin_connect.password = (
         murkelhausen_secrets_block.garmin_password.get_secret_value()
     )
-    logger.info("Finished getting secrets.")
 
 
-@flow
-def main_flow(
-    start_date: date | None = None,
-    end_date: date | None = None,
-):
-    get_secrets()
+@flow(flow_run_name=_generate_flowrun_name)
+def main_flow(start_date: date | None = None, end_date: date | None = None):
     logger = get_run_logger()
-    logger.info("Starting Garmin main flow.")
+    logger.info("Getting secrets.")
+    get_secrets()
+    logger.info("Finished getting secrets.")
+    logger.info(f"Starting Garmin main flow with {start_date=} and {end_date=}.")
     garmin_flow(start_date=start_date, end_date=end_date)
-    logger.info("Finished Garmin main flow.")
+    logger.info(f"Finished Garmin main flow with {start_date=} and {end_date=}.")
 
 
 if __name__ == "__main__":
-    # replace with flow.from_source https://docs.prefect.io/latest/getting-started/quickstart/#step-4-make-your-code-schedulable
     main_flow.serve(
         name="murkelhausen_flow",
         schedule=IntervalSchedule(

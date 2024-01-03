@@ -8,32 +8,40 @@ from prefect.task_runners import ConcurrentTaskRunner
 from murkelhausen import garmin
 
 
-@flow(task_runner=ConcurrentTaskRunner())
-def garmin_flow(
-    start_date: date | None = None,
-    end_date: date | None = None,
-):
+@flow(
+    task_runner=ConcurrentTaskRunner(),
+    flow_run_name="garmin-flow_{start_date}_{end_date}",
+)
+def garmin_flow(start_date: date | None = None, end_date: date | None = None):
     """
     Default start date is always yesterday and end date is today,
     except when custom dates are specified.
     """
-    garmin_client = get_garmin_client()
+    logger = get_run_logger()
     if start_date is None:
         start_date = date.today() - relativedelta(days=1)
     if end_date is None:
         end_date = date.today()
 
+    logger.info(
+        f"Starting garmin flow with {start_date=} and {end_date=}. Retrieving garmin client."
+    )
+    garmin_client = get_garmin_client()
+    logger.info(f"Finished retrieving garmin client.")
+
+    logger.info(f"Starting heart rate data task(s).")
     for count_dates in range((end_date - start_date).days + 1):
         measure_date = start_date + relativedelta(days=count_dates)
+        # TODO test .submit()
         heart_rate_data(measure_date=measure_date, garmin_client=garmin_client)
 
 
-@task
+@task(task_run_name="garmin_client")
 def get_garmin_client() -> Garmin:
     return garmin.get_garmin_client()
 
 
-@task
+@task(task_run_name="garmin_heart_rate_data_{measure_date}")
 def heart_rate_data(measure_date: date, garmin_client: Garmin) -> None:
     logger = get_run_logger()
     logger.info(f"Starting task 'garmin heart rate data' for {measure_date}")
