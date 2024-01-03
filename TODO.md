@@ -5,6 +5,7 @@
   - https://docs.prefect.io/2.10.21/guides/deployment/docker/
   - https://prefecthq.github.io/prefect-docker/
 - [] add Artifacts
+- [] add result message of task/flow runs
 - [] names of flow runs
 - [x] poetry env on beowulf in directory
 - [] why does prefect uses internally pydantic v1? this has the consequence for `from pydantic.v1 import SecretStr` in src/murkelhausen/pipeline.py
@@ -12,3 +13,4 @@
   - is done through the user interface with automations and email block 
 - [] create python script to create above automations and email block through API
   - https://app.prefect.cloud/api/docs?deviceId=d3c38c62-be25-406e-985e-30dd5845c1a3#tag/Automations
+- [] parallel execution of tasks with DaskRunner? https://discourse.prefect.io/t/why-is-my-function-not-running-in-parallel-even-with-dasktaskrunner-raytaskrunner/729/13?
