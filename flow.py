@@ -14,5 +14,5 @@ if __name__ == "__main__":
             anchor_date=datetime(2023, 12, 1, 0),
             timezone="Europe/Berlin",
         )
-        # version=__version__,  # TODO add version to murkelhausen-data
+        # version=__version__,  # TODO add project version to murkelhausen-data from pyproject.toml
     )
