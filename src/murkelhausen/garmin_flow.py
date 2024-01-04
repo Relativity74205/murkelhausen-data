@@ -10,6 +10,7 @@ from murkelhausen import garmin
 
 
 def _generate_flowrun_name():
+    """Generates a flow run name based on the parameters of the flow run."""
     parameters = flow_run.parameters
     start_date = parameters["start_date"]
     end_date = parameters["end_date"]
