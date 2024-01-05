@@ -142,23 +142,27 @@ def monitor_docker_processes():
 
 
 @task(task_run_name="backup_postgres_globals_{backup_datetime}")
-def backup_postgres_globals(backup_datetime: datetime):
+def backup_postgres_globals(backup_datetime: str):
+    logger = get_run_logger()
     cmd = f"docker-compose -f {POSTGRES_PATH}/docker-compose.yml exec -T postgres pg_dumpall --globals-only -U postgres > {POSTGRES_BACKUP_PATH}/{backup_datetime}__globals.sql"
+    logger.info(f"{cmd=}")
     ShellOperation(
         name="backup_postgres_globals",
         commands=[cmd],
         return_all=False,
-    )
+    ).run()
 
 
 @task(task_run_name="backup_postgres_{database_name}_{backup_datetime}")
-def backup_postgres(database_name: str, backup_datetime: datetime):
+def backup_postgres(database_name: str, backup_datetime: str):
+    logger = get_run_logger()
     cmd = f"docker-compose -f {POSTGRES_PATH}/docker-compose.yml exec -T postgres pg_dump -F c -U postgres {database_name} > {POSTGRES_BACKUP_PATH}/{backup_datetime}__{database_name}.sql"
+    logger.info(f"{cmd=}")
     ShellOperation(
         name=f"backup_postgres_{database_name}",
         commands=[cmd],
         return_all=False,
-    )
+    ).run()
 
 
 @flow(
@@ -170,16 +174,16 @@ def beowulf_backup_flow():
     backup_datetime = datetime.now().strftime("%Y-%m-%dT%H_%M_%S")
     logger = get_run_logger()
     backup_postgres_globals(backup_datetime)
-    logger.info("Performed backup of postgres globals.")
-    for database_name in POSTGRES_DATABASES:
-        backup_postgres(database_name=database_name, backup_datetime=backup_datetime)
-        logger.info(f"Performed backup of postgres database {database_name}.")
-    cleanup_backup_files("globals")
-    logger.info("Cleaned old globals database backups.")
-    for database_name in POSTGRES_DATABASES:
-        cleanup_backup_files(database_name)
-        logger.info(f"Cleaned old {database_name} database backups.")
-    logger.info("Cleaned old database backups.")
+    # logger.info("Performed backup of postgres globals.")
+    # for database_name in POSTGRES_DATABASES:
+    #     backup_postgres(database_name=database_name, backup_datetime=backup_datetime)
+    #     logger.info(f"Performed backup of postgres database {database_name}.")
+    # cleanup_backup_files("globals")
+    # logger.info("Cleaned old globals database backups.")
+    # for database_name in POSTGRES_DATABASES:
+    #     cleanup_backup_files(database_name)
+    #     logger.info(f"Cleaned old {database_name} database backups.")
+    # logger.info("Cleaned old database backups.")
     # backup_kafka.submit()
     # backup_mosquitto.submit()
     # backup_zigbee2mqtt.submit()
