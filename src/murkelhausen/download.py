@@ -3,6 +3,7 @@ from datetime import date, timedelta, datetime
 from prefect import flow, get_run_logger, task
 from prefect.client.schemas.schedules import IntervalSchedule
 
+from murkelhausen.backup import backup_flow
 from murkelhausen.config import config
 from murkelhausen.garmin_flow import garmin_flow
 from murkelhausen.prefect_secret_block import MurkelHausenSecrets
@@ -38,6 +39,7 @@ def main_flow(start_date: date | None = None, end_date: date | None = None):
     logger.info(f"Starting Garmin main flow with {start_date=} and {end_date=}.")
     garmin_flow(start_date=start_date, end_date=end_date)
     logger.info(f"Finished Garmin main flow with {start_date=} and {end_date=}.")
+    backup_flow()
 
 
 if __name__ == "__main__":

@@ -1591,6 +1591,23 @@ websockets = ">=10.4,<13.0"
 dev = ["cairosvg", "codespell", "flaky", "ipython", "ipython (==8.12.*)", "jinja2", "mike", "mkdocs", "mkdocs-gen-files", "mkdocs-material", "mkdocstrings-python", "mock", "moto", "mypy", "numpy", "pillow", "pre-commit", "pytest (>7)", "pytest-asyncio (>=0.18.2,!=0.22.0,<0.23.0)", "pytest-benchmark", "pytest-cov", "pytest-env", "pytest-flakefinder", "pytest-timeout", "pytest-xdist (<3.4.0)", "pytkdocs (>=0.14.2)", "pyyaml", "requests", "respx", "ruff", "setuptools (!=60.9.0)", "virtualenv", "watchfiles"]
 
 [[package]]
+name = "prefect-shell"
+version = "0.2.2"
+description = "Prefect tasks and subflows for interacting with shell commands."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "prefect-shell-0.2.2.tar.gz", hash = "sha256:49d3fd7c8e8c7392ad0fccb63912ce405ea213384f9b22e2272498e962890bee"},
+    {file = "prefect_shell-0.2.2-py3-none-any.whl", hash = "sha256:af78f6116b57d7b577c9aad3d8eb4d046be3b8ed5c7a5fa9a8edba0f219220c8"},
+]
+
+[package.dependencies]
+prefect = ">=2.13.5"
+
+[package.extras]
+dev = ["black", "coverage", "flake8", "interrogate", "isort", "mkdocs", "mkdocs-gen-files", "mkdocs-material", "mkdocstrings[python]", "mock", "mypy", "pillow", "pre-commit", "pytest", "pytest-asyncio"]
+
+[[package]]
 name = "psycopg"
 version = "3.1.16"
 description = "PostgreSQL database adapter for Python"
@@ -2982,4 +2999,4 @@ requests = "*"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "73bf46a2daaf52a8952901524956b62dea395148413223a25d7a3e835d25d023"
+content-hash = "ee5fed0077622cdf9df0ac0e124787b507e318b022ba6bc9346a64fe14f42652"
