@@ -7,9 +7,9 @@ from prefect.client.schemas.schedules import IntervalSchedule
 if __name__ == "__main__":
     main = flow.from_source(
         source="git@github.com:Relativity74205/murkelhausen-data.git",
-        entrypoint="src/murkelhausen/download.py:main_flow",
+        entrypoint="src/murkelhausen/prefect/flow_data.py:data_main_flow",
     ).to_deployment(
-        name="murkelhausen_flow",
+        name="murkelhausen-data",
         schedule=IntervalSchedule(
             interval=timedelta(hours=1),
             anchor_date=datetime(2023, 12, 1, 0),
@@ -19,9 +19,9 @@ if __name__ == "__main__":
     )
     backup = flow.from_source(
         source="git@github.com:Relativity74205/murkelhausen-data.git",
-        entrypoint="src/murkelhausen/backup.py:backup_flow",
+        entrypoint="src/murkelhausen/prefect/flow_beowulf_backup.py:beowulf_backup_flow",
     ).to_deployment(
-        name="backup_flow",
+        name="beowulf-backup",
         schedule=IntervalSchedule(
             interval=timedelta(days=1),
             anchor_date=datetime(2023, 12, 1, 0),

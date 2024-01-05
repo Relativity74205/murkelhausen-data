@@ -7,7 +7,7 @@ from dateutil import relativedelta
 
 import docker
 from prefect import flow, task, get_run_logger
-from prefect_shell import shell_run_command, ShellOperation
+from prefect_shell import ShellOperation
 from prefect.task_runners import ConcurrentTaskRunner
 
 POSTGRES_BACKUP_PATH = "/home/arkadius/backup/postgres"
@@ -162,11 +162,11 @@ def backup_postgres(database_name: str, backup_datetime: datetime):
 
 
 @flow(
-    name="beowulf backup",
+    name="beowulf-backup-flow",
     flow_run_name=f"beowulf_backup_{date.today().isoformat()}",
     task_runner=ConcurrentTaskRunner(),
 )
-def backup_flow():
+def beowulf_backup_flow():
     backup_datetime = datetime.now().strftime("%Y-%m-%dT%H_%M_%S")
     logger = get_run_logger()
     backup_postgres_globals(backup_datetime)
@@ -190,4 +190,4 @@ def backup_flow():
 
 
 if __name__ == "__main__":
-    backup_flow()
+    beowulf_backup_flow()

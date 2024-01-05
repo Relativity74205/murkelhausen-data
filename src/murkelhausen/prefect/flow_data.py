@@ -3,10 +3,9 @@ from datetime import date, timedelta, datetime
 from prefect import flow, get_run_logger, task
 from prefect.client.schemas.schedules import IntervalSchedule
 
-from murkelhausen.backup import backup_flow
 from murkelhausen.config import config
-from murkelhausen.garmin_flow import garmin_flow
-from murkelhausen.prefect_secret_block import MurkelHausenSecrets
+from murkelhausen.prefect.subflow_garmin import garmin_flow
+from murkelhausen.prefect.prefect_secret_block import MurkelHausenSecrets
 from murkelhausen.util.logger import setup_logging
 
 setup_logging()
@@ -31,7 +30,7 @@ def get_secrets():
 
 
 @flow(flow_run_name=_generate_flowrun_name)
-def main_flow(start_date: date | None = None, end_date: date | None = None):
+def data_main_flow(start_date: date | None = None, end_date: date | None = None):
     logger = get_run_logger()
     logger.info("Getting secrets.")
     get_secrets()
@@ -39,11 +38,10 @@ def main_flow(start_date: date | None = None, end_date: date | None = None):
     logger.info(f"Starting Garmin main flow with {start_date=} and {end_date=}.")
     garmin_flow(start_date=start_date, end_date=end_date)
     logger.info(f"Finished Garmin main flow with {start_date=} and {end_date=}.")
-    backup_flow()
 
 
 if __name__ == "__main__":
-    main_flow.serve(
+    data_main_flow.serve(
         name="murkelhausen_flow",
         schedule=IntervalSchedule(
             interval=timedelta(hours=1),
