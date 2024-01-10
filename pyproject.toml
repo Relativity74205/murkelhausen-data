@@ -15,7 +15,7 @@ garminconnect = "^0.2.11"
 python-dateutil = "^2.8.2"
 sqlalchemy = "^2.0.23"
 psycopg = {version = "^3.1.16", extras = ["binary", "pool"]}
-prefect = "^2.14.12"
+prefect = "^2.14.13"
 prefect-shell = "^0.2.2"
 
 [tool.poetry.group.dev.dependencies]
