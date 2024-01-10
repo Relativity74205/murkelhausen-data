@@ -18,7 +18,8 @@ def get_garmin_client() -> Garmin:
     return garmin
 
 
-def get_heartrate_data(*, measure_date: date, garmin_client: Garmin, logger) -> None:
+def get_heartrate_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
+    """Returns the amount of heart rate data points saved."""
     logger.info(f"Getting heart rate data for {measure_date}.")
     heart_rates_daily, heart_rates = _get_heart_rates(garmin_client, measure_date)
 
@@ -27,3 +28,5 @@ def get_heartrate_data(*, measure_date: date, garmin_client: Garmin, logger) -> 
     logger.info("Saved daily heart rate data.")
     save_objects(heart_rates)
     logger.info("Saved detailed heart rate data. Done.")
+
+    return len(heart_rates)

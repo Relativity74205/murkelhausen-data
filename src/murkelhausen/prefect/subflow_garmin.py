@@ -5,6 +5,7 @@ from garminconnect import Garmin
 from prefect import flow, task, get_run_logger
 from prefect.runtime import flow_run
 from prefect.task_runners import ConcurrentTaskRunner
+from prefect.artifacts import create_table_artifact
 
 from murkelhausen import garmin
 
@@ -32,8 +33,6 @@ def garmin_flow(start_date: date | None = None, end_date: date | None = None):
     """
     Default start date is always yesterday and end date is today,
     except when custom dates are specified.
-
-
     """
     logger = get_run_logger()
     if start_date is None:
@@ -45,13 +44,34 @@ def garmin_flow(start_date: date | None = None, end_date: date | None = None):
         f"Starting garmin flow with {start_date=} and {end_date=}. Retrieving garmin client."
     )
     garmin_client = get_garmin_client()
-    logger.info(f"Finished retrieving garmin client.")
+    logger.info("Finished retrieving garmin client.")
 
-    logger.info(f"Starting heart rate data task(s).")
+    logger.info("Starting heart rate data task(s).")
+
+    heart_rate_data_futures = {}
     for count_dates in range((end_date - start_date).days + 1):
         measure_date = start_date + relativedelta(days=count_dates)
-        heart_rate_data.submit(measure_date=measure_date, garmin_client=garmin_client)
-    logger.info(f"Finished heart rate data task(s).")
+        heart_rate_data_futures[measure_date] = heart_rate_data.submit(
+            measure_date=measure_date, garmin_client=garmin_client
+        )
+    heart_rate_data_points = {
+        measure_date: future.result()
+        for measure_date, future in heart_rate_data_futures.items()
+    }
+    logger.info("Finished heart rate data task(s).")
+
+    logger.info("Creating garmin report.")
+    garmin_report = [
+        {"metric": "heart_rate_data_points"} | heart_rate_data_points,
+        {"metric": "foo", "2024-01-09": 1, "2024-01-10": 2},
+    ]
+
+    create_table_artifact(
+        key="garmin-report",
+        table=garmin_report,
+        description="Downloaded garmin data",
+    )
+    logger.info("Created garmin report.")
 
 
 @task(task_run_name="garmin_client")
@@ -63,7 +83,7 @@ def get_garmin_client() -> Garmin:
 def heart_rate_data(measure_date: date, garmin_client: Garmin) -> None:
     logger = get_run_logger()
     logger.info(f"Starting task 'garmin heart rate data' for {measure_date}")
-    garmin.get_heartrate_data(
+    heart_rate_data_points = garmin.get_heartrate_data(
         measure_date=measure_date, garmin_client=garmin_client, logger=logger
     )
 

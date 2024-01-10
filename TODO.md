@@ -6,7 +6,7 @@
   - https://prefecthq.github.io/prefect-docker/
 - [] add Artifacts
 - [] add result message of task/flow runs
-- [] names of flow runs
+- [x] names of flow runs
 - [x] poetry env on beowulf in directory
 - [] why does prefect uses internally pydantic v1? this has the consequence for `from pydantic.v1 import SecretStr` in src/murkelhausen/pipeline.py
 - [x] integrate email notification
