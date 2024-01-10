@@ -65,7 +65,7 @@ def garmin_flow(start_date: date | None = None, end_date: date | None = None):
         {"metric": "heart_rate_data_points"} | heart_rate_data_points,
         {"metric": "foo", "2024-01-09": 1, "2024-01-10": 2},
     ]
-    logger.info(f"{garmin_report=}")
+    logger.info("{garmin_report}")
 
     create_table_artifact(
         key="garmin-report",
