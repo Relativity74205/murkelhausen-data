@@ -60,7 +60,6 @@ def garmin_flow(start_date: date | None = None, end_date: date | None = None):
     }
     logger.info("Finished heart rate data task(s).")
 
-    logger.info("Creating garmin report.")
     garmin_report = [
         {"metric": "heart_rate_data_points"} | heart_rate_data_points,
     ]
