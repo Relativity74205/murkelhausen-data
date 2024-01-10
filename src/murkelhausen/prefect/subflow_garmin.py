@@ -55,7 +55,7 @@ def garmin_flow(start_date: date | None = None, end_date: date | None = None):
             measure_date=measure_date, garmin_client=garmin_client
         )
     heart_rate_data_points = {
-        measure_date: future.result()
+        measure_date.isoformat(): future.result()
         for measure_date, future in heart_rate_data_futures.items()
     }
     logger.info("Finished heart rate data task(s).")
@@ -65,6 +65,7 @@ def garmin_flow(start_date: date | None = None, end_date: date | None = None):
         {"metric": "heart_rate_data_points"} | heart_rate_data_points,
         {"metric": "foo", "2024-01-09": 1, "2024-01-10": 2},
     ]
+    logger.info(f"{garmin_report=}")
 
     create_table_artifact(
         key="garmin-report",
@@ -80,10 +81,10 @@ def get_garmin_client() -> Garmin:
 
 
 @task(task_run_name="garmin_heart_rate_data_{measure_date}")
-def heart_rate_data(measure_date: date, garmin_client: Garmin) -> None:
+def heart_rate_data(measure_date: date, garmin_client: Garmin) -> int:
     logger = get_run_logger()
     logger.info(f"Starting task 'garmin heart rate data' for {measure_date}")
-    heart_rate_data_points = garmin.get_heartrate_data(
+    return garmin.get_heartrate_data(
         measure_date=measure_date, garmin_client=garmin_client, logger=logger
     )
 
