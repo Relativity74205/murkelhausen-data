@@ -1,12 +1,12 @@
-from datetime import date, datetime
+from datetime import datetime
 from logging import getLogger
 
 import click
-from dateutil.relativedelta import relativedelta
 
 from murkelhausen import __version__
 from murkelhausen import garmin
-from murkelhausen.prefect_secret_block import create_prefect_secrets_block
+from murkelhausen.cli.cli_garmin import garmin_arguments, _get_garmin_data
+from murkelhausen.prefect.prefect_secret_block import create_prefect_secrets_block
 from murkelhausen.util import logger
 from murkelhausen import persistance_layer
 
@@ -70,32 +70,21 @@ def auth_token():
 
 
 @garmin_group.command("get-heart-rates")
-@click.argument(
-    "start_date",
-    type=click.DateTime(formats=["%Y-%m-%d"]),
-    required=False,
-    default=str(date.today()),
-)
-@click.argument(
-    "end_date",
-    type=click.DateTime(formats=["%Y-%m-%d"]),
-    required=False,
-)
+@garmin_arguments
 def get_heart_rates_command(start_date: datetime, end_date: datetime | None):
-    garmin_client = garmin.get_garmin_client()
+    _get_garmin_data(garmin.get_heartrate_data, start_date, end_date)
 
-    start_date = start_date.date()
-    if end_date is None:
-        end_date = start_date
-    else:
-        end_date = end_date.date()
 
-    log.info(f"Started heart rate data command for {start_date=} and {end_date=}.")
-    for count_dates in range((end_date - start_date).days + 1):
-        measure_date = start_date + relativedelta(days=count_dates)
-        garmin.get_heartrate_data(
-            measure_date=measure_date, garmin_client=garmin_client, logger=log
-        )
+@garmin_group.command("get-steps")
+@garmin_arguments
+def get_steps(start_date: datetime, end_date: datetime | None):
+    _get_garmin_data(garmin.get_steps_data, start_date, end_date)
+
+
+@garmin_group.command("get-floors")
+@garmin_arguments
+def get_floors(start_date: datetime, end_date: datetime | None):
+    _get_garmin_data(garmin.get_floors_data, start_date, end_date)
 
 
 @cli.group

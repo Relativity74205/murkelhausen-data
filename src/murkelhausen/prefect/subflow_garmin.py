@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import date
 
 from dateutil.relativedelta import relativedelta
@@ -46,23 +47,36 @@ def garmin_flow(start_date: date | None = None, end_date: date | None = None):
     garmin_client = get_garmin_client()
     logger.info("Finished retrieving garmin client.")
 
-    logger.info("Starting heart rate data task(s).")
+    logger.info("Starting data task(s).")
 
-    heart_rate_data_futures = {}
+    futures = defaultdict(dict)
     for count_dates in range((end_date - start_date).days + 1):
         measure_date = start_date + relativedelta(days=count_dates)
-        heart_rate_data_futures[measure_date] = heart_rate_data.submit(
+        futures["heart_rate_data_points"][measure_date] = heart_rate_data.submit(
             measure_date=measure_date, garmin_client=garmin_client
         )
-    heart_rate_data_points = {
-        measure_date.isoformat(): future.result()
-        for measure_date, future in heart_rate_data_futures.items()
-    }
-    logger.info("Finished heart rate data task(s).")
+        futures["steps_data_points"][measure_date] = steps_data.submit(
+            measure_date=measure_date, garmin_client=garmin_client
+        )
+        futures["floors_data_points"][measure_date] = floors_data.submit(
+            measure_date=measure_date, garmin_client=garmin_client
+        )
 
+    logger.info("Finished starting data task(s).")
+
+    logger.info("Starting to collect task results.")
+    data_points = {}
+    for metric, futures in futures.items():
+        data_points[metric] = {
+            measure_date.isoformat(): future.result()
+            for measure_date, future in futures.items()
+        }
     garmin_report = [
-        {"metric": "heart_rate_data_points"} | heart_rate_data_points,
+        {"metric": metric} | metric_results
+        for metric, metric_results in data_points.items()
     ]
+
+    logger.info("Finished collecting task results.")
 
     create_table_artifact(
         key="garmin-report",
@@ -82,6 +96,24 @@ def heart_rate_data(measure_date: date, garmin_client: Garmin) -> int:
     logger = get_run_logger()
     logger.info(f"Starting task 'garmin heart rate data' for {measure_date}")
     return garmin.get_heartrate_data(
+        measure_date=measure_date, garmin_client=garmin_client, logger=logger
+    )
+
+
+@task(task_run_name="garmin_steps_data_{measure_date}")
+def steps_data(measure_date: date, garmin_client: Garmin) -> int:
+    logger = get_run_logger()
+    logger.info(f"Starting task 'garmin steps data' for {measure_date}")
+    return garmin.get_steps_data(
+        measure_date=measure_date, garmin_client=garmin_client, logger=logger
+    )
+
+
+@task(task_run_name="garmin_floors_data_{measure_date}")
+def floors_data(measure_date: date, garmin_client: Garmin) -> int:
+    logger = get_run_logger()
+    logger.info(f"Starting task 'garmin floors data' for {measure_date}")
+    return garmin.get_floors_data(
         measure_date=measure_date, garmin_client=garmin_client, logger=logger
     )
 
