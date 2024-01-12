@@ -26,7 +26,7 @@ def get_heartrate_data(*, measure_date: date, garmin_client: Garmin, logger) -> 
     logger.info(f"Got {len(heart_rates)} heart rate data points. Saving.")
     save_objects((heart_rates_daily,), upsert=True)
     logger.info("Saved daily heart rate data.")
-    save_objects(heart_rates)
+    save_objects(heart_rates, upsert=True)
     logger.info("Saved detailed heart rate data. Done.")
 
     return len(heart_rates)
