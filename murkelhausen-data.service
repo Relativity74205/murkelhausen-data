@@ -3,8 +3,8 @@ Description=Prefect serves murkelhausen-data flow
 
 [Service]
 User=arkadius
-#WorkingDirectory=/tmp
-ExecStart=/home/arkadius/murkelhausen-data/.venv/bin/python /home/arkadius/murkelhausen-data/flow.py
+WorkingDirectory=/home/arkadius/murkelhausen-data
+ExecStart=/home/arkadius/murkelhausen-data/.venv/bin/python src/murkelhausen/prefect/serve.py
 Restart=always
 
 [Install]

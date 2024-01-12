@@ -29,7 +29,7 @@ def get_secrets():
     )
 
 
-@flow(flow_run_name=_generate_flowrun_name)
+@flow(flow_run_name=_generate_flowrun_name, retries=3, retry_delay_seconds=60)
 def data_main_flow(start_date: date | None = None, end_date: date | None = None):
     logger = get_run_logger()
     logger.info("Getting secrets.")
@@ -41,12 +41,4 @@ def data_main_flow(start_date: date | None = None, end_date: date | None = None)
 
 
 if __name__ == "__main__":
-    data_main_flow.serve(
-        name="murkelhausen_flow",
-        schedule=IntervalSchedule(
-            interval=timedelta(hours=1),
-            anchor_date=datetime(2023, 12, 1, 0),
-            timezone="Europe/Berlin",
-        )
-        # version=__version__,  # TODO add version to murkelhausen-data
-    )
+    data_main_flow()
