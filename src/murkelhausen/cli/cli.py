@@ -5,7 +5,7 @@ import click
 
 from murkelhausen import __version__
 from murkelhausen import garmin
-from murkelhausen.cli.cli_garmin import garmin_arguments, _get_garmin_data
+from murkelhausen.cli import cli_garmin
 from murkelhausen.prefect.prefect_secret_block import create_prefect_secrets_block
 from murkelhausen.util import logger
 from murkelhausen import persistance_layer
@@ -70,21 +70,29 @@ def auth_token():
 
 
 @garmin_group.command("get-heart-rates")
-@garmin_arguments
+@cli_garmin.garmin_arguments
 def get_heart_rates_command(start_date: datetime, end_date: datetime | None):
-    _get_garmin_data(garmin.get_heartrate_data, start_date, end_date)
+    cli_garmin.get_garmin_data(garmin.get_heartrate_data, start_date, end_date)
 
 
 @garmin_group.command("get-steps")
-@garmin_arguments
+@cli_garmin.garmin_arguments
 def get_steps(start_date: datetime, end_date: datetime | None):
-    _get_garmin_data(garmin.get_steps_data, start_date, end_date)
+    cli_garmin.get_garmin_data(garmin.get_steps_data, start_date, end_date)
+
+
+@garmin_group.command("get-steps-daily")
+@cli_garmin.garmin_arguments
+def get_steps_daily(start_date: datetime, end_date: datetime | None):
+    cli_garmin.get_garmin_data_daterange(
+        garmin.get_daily_steps_data, start_date=start_date, end_date=end_date
+    )
 
 
 @garmin_group.command("get-floors")
-@garmin_arguments
+@cli_garmin.garmin_arguments
 def get_floors(start_date: datetime, end_date: datetime | None):
-    _get_garmin_data(garmin.get_floors_data, start_date, end_date)
+    cli_garmin.get_garmin_data(garmin.get_floors_data, start_date, end_date)
 
 
 @cli.group

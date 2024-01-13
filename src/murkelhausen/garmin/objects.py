@@ -28,18 +28,40 @@ class HeartRate(Base):
 class Steps(Base):
     __tablename__ = "steps"
 
-    startGMT: Mapped[datetime] = mapped_column(primary_key=True)  # TODO timezone is off
-    endGMT: Mapped[datetime]  # TODO timezone is off
+    tstamp_start: Mapped[datetime] = mapped_column(
+        primary_key=True
+    )  # TODO timezone is off
+    tstamp_end: Mapped[datetime]  # TODO timezone is off
     steps: Mapped[int | None]
     pushes: Mapped[int | None]
     primaryActivityLevel: Mapped[str | None]
     activityLevelConstant: Mapped[bool | None]
 
 
+class StepsDaily(Base):
+    """
+    [{
+        "calendarDate": "2024-01-13",
+        "totalSteps": 12513,
+        "totalDistance": 10408,
+        "stepGoal": 9060
+    }]
+    """
+
+    __tablename__ = "steps_daily"
+
+    calendar_date: Mapped[date] = mapped_column(primary_key=True)
+    total_steps: Mapped[int | None]
+    total_distance: Mapped[int | None]
+    step_goal: Mapped[int | None]
+
+
 class Floors(Base):
     __tablename__ = "floors"
 
-    startGMT: Mapped[datetime] = mapped_column(primary_key=True)  # TODO timezone is off
-    endGMT: Mapped[datetime]  # TODO timezone is off
+    tstamp_start: Mapped[datetime] = mapped_column(
+        primary_key=True
+    )  # TODO timezone is off
+    tstamp_end: Mapped[datetime]  # TODO timezone is off
     floorsAscended: Mapped[int | None]
     floorsDescended: Mapped[int | None]

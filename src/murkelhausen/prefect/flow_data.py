@@ -29,7 +29,7 @@ def get_secrets():
     )
 
 
-@flow(flow_run_name=_generate_flowrun_name, retries=3, retry_delay_seconds=60)
+@flow(flow_run_name=_generate_flowrun_name, retry_delay_seconds=60)
 def data_main_flow(start_date: date | None = None, end_date: date | None = None):
     logger = get_run_logger()
     logger.info("Getting secrets.")

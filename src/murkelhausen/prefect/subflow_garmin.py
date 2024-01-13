@@ -47,43 +47,69 @@ def garmin_flow(start_date: date | None = None, end_date: date | None = None):
     garmin_client = get_garmin_client()
     logger.info("Finished retrieving garmin client.")
 
-    logger.info("Starting data task(s).")
+    logger.info("Starting daily data task(s).")
 
-    futures = defaultdict(dict)
+    futures_daily = defaultdict(dict)
     for count_dates in range((end_date - start_date).days + 1):
         measure_date = start_date + relativedelta(days=count_dates)
-        futures["heart_rate_data_points"][measure_date] = heart_rate_data.submit(
+        futures_daily["heart_rate_data_points"][measure_date] = heart_rate_data.submit(
             measure_date=measure_date, garmin_client=garmin_client
         )
-        futures["steps_data_points"][measure_date] = steps_data.submit(
+        futures_daily["steps_data_points"][measure_date] = steps_data.submit(
             measure_date=measure_date, garmin_client=garmin_client
         )
-        futures["floors_data_points"][measure_date] = floors_data.submit(
+        futures_daily["floors_data_points"][measure_date] = floors_data.submit(
             measure_date=measure_date, garmin_client=garmin_client
         )
 
-    logger.info("Finished starting data task(s).")
+    logger.info("Finished starting daily data task(s).")
 
-    logger.info("Starting to collect task results.")
-    data_points = {}
-    for metric, futures in futures.items():
-        data_points[metric] = {
+    logger.info("Starting to collect daily task results.")
+    daily_data_points = {}
+    for metric, futures_daily in futures_daily.items():
+        daily_data_points[metric] = {
             measure_date.isoformat(): future.result()
-            for measure_date, future in futures.items()
+            for measure_date, future in futures_daily.items()
         }
-    garmin_report = [
+    garmin_daily_report = [
         {"metric": metric} | metric_results
-        for metric, metric_results in data_points.items()
+        for metric, metric_results in daily_data_points.items()
     ]
 
-    logger.info("Finished collecting task results.")
+    logger.info("Finished collecting daily task results.")
 
     create_table_artifact(
-        key="garmin-report",
-        table=garmin_report,
-        description="Downloaded garmin data",
+        key="garmin-daily-report",
+        table=garmin_daily_report,
+        description="Downloaded garmin daily data.",
     )
-    logger.info("Created garmin report.")
+    logger.info("Created garmin report for daily data.")
+
+    logger.info("Starting date range data task(s).")
+    futures_date_range = {}
+    futures_date_range["steps_daily_data_points"] = steps_daily_data.submit(
+        start_date=start_date, end_date=end_date, garmin_client=garmin_client
+    )
+    logger.info("Finished starting date range data task(s).")
+
+    logger.info("Starting to collect date range task results.")
+    date_range_data_points = {}
+    for metric, date_range_future in futures_date_range.items():
+        date_range_data_points[metric] = date_range_future.result()
+
+    garmin_date_range_report = [
+        {"metric": metric, "new entries": metric_results}
+        for metric, metric_results in date_range_data_points.items()
+    ]
+
+    logger.info("Finished collecting daily task results.")
+
+    create_table_artifact(
+        key="garmin-date-range-report",
+        table=garmin_date_range_report,
+        description="Downloaded garmin date range data.",
+    )
+    logger.info("Created garmin report for daily data.")
 
 
 @task(task_run_name="garmin_client")
@@ -106,6 +132,20 @@ def steps_data(measure_date: date, garmin_client: Garmin) -> int:
     logger.info(f"Starting task 'garmin steps data' for {measure_date}")
     return garmin.get_steps_data(
         measure_date=measure_date, garmin_client=garmin_client, logger=logger
+    )
+
+
+@task(task_run_name="garmin_steps_daily_data_{start_date}_{end_date}")
+def steps_daily_data(start_date: date, end_date: date, garmin_client: Garmin) -> int:
+    logger = get_run_logger()
+    logger.info(
+        f"Starting task 'garmin steps daily data' for {steps_data=} and {end_date=}."
+    )
+    return garmin.get_daily_steps_data(
+        start_date=start_date,
+        end_date=end_date,
+        garmin_client=garmin_client,
+        logger=logger,
     )
 
 
