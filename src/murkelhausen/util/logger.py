@@ -31,7 +31,7 @@ def setup_logging():
                 "murkelhausen": {
                     "handlers": ["console"],
                     "level": config.app.loglevel,
-                    "propagate": True,
+                    "propagate": False,
                 },
             },
         }
