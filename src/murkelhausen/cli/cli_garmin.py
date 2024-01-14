@@ -43,7 +43,7 @@ def get_garmin_data_daterange(
         end_date = end_date.date()
 
     log.info(
-        f"Started {garmin_data_function.__name__} command for {start_date=} and {end_date=}."
+        f"Started {garmin_data_function.__name__} command for start={start_date.isoformat()} and end={end_date.isoformat()}."
     )
 
     garmin_data_function(

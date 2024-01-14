@@ -123,3 +123,64 @@ def get_floors_data(*, measure_date: date, garmin_client: Garmin, logger) -> int
     logger.info("Saved floors data. Done.")
 
     return len(floors)
+
+
+def get_stress_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
+    """Returns the amount of stress battery data points saved."""
+    logger.info(f"Getting stress data for {measure_date}.")
+    data = garmin_client.get_stress_data(measure_date.isoformat())
+    stress = tuple(
+        objects.Stress(
+            tstamp=datetime.fromtimestamp(entry[0] / 1000),
+            stress_level=entry[1],
+        )
+        for entry in data["stressValuesArray"]
+    )
+    stress_daily = objects.StressDaily(
+        calendar_date=date.fromisoformat(data["calendarDate"]),
+        max_stress_level=data["maxStressLevel"],
+        avg_stress_level=data["avgStressLevel"],
+        stress_chart_value_offset=data["stressChartValueOffset"],
+        stress_chart_y_axis_origin=data["stressChartYAxisOrigin"],
+    )
+    logger.info(f"Got {len(stress)} stress data points. Saving.")
+    save_objects(stress, upsert=True)
+    logger.info("Saving daily stress data.")
+    save_objects((stress_daily,), upsert=True)
+    logger.info("Saved stress data. Done.")
+
+    return len(stress)
+
+
+def get_body_battery_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
+    """Returns the amount of body battery data points saved."""
+    logger.info(f"Getting body battery data for {measure_date}.")
+    # get_stress_data route gets better detailed information than get_body_battery_data
+    data_stress = garmin_client.get_stress_data(measure_date.isoformat())
+    body_battery = tuple(
+        objects.BodyBattery(
+            tstamp=datetime.fromtimestamp(entry[0] / 1000),
+            body_battery_status=entry[1],
+            body_battery_level=entry[2],
+            body_battery_version=entry[3],
+        )
+        for entry in data_stress["bodyBatteryValuesArray"]
+    )
+    logger.info(f"Got {len(body_battery)} body battery data points. Saving.")
+    save_objects(body_battery, upsert=True)
+    logger.info("Saved body battery data. Done.")
+
+    data_body = garmin_client.get_body_battery(measure_date.isoformat())
+    body_battery_daily = objects.BodyBatteryDaily(
+        calendar_date=date.fromisoformat(data_body[0]["calendarDate"]),
+        charged=data_body[0]["charged"],
+        drained=data_body[0]["drained"],
+    )
+    save_objects((body_battery_daily,), upsert=True)
+    logger.info("Saved body battery daily data. Done.")
+
+    # TODO: bodyBatteryDynamicFeedbackEvent
+    # TODO: bodyBatteryActivityEvent
+    # TODO: endOfDayBodyBatteryDynamicFeedbackEvent
+
+    return len(body_battery)
