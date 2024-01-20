@@ -1,7 +1,9 @@
 import logging
 from datetime import date, datetime
+from typing import Any
 
 from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import JSON
 
 from murkelhausen.persistance_layer.postgres import Base
 
@@ -77,6 +79,10 @@ class BodyBatteryDaily(Base):
     calendar_date: Mapped[date] = mapped_column(primary_key=True)
     charged: Mapped[int | None]
     drained: Mapped[int | None]
+    dynamic_feedback_event: Mapped[dict[str, Any] | None] = mapped_column(type_=JSON)
+    end_of_day_dynamic_feedback_event: Mapped[dict[str, Any] | None] = mapped_column(
+        type_=JSON
+    )
 
 
 class BodyBattery(Base):
@@ -86,6 +92,17 @@ class BodyBattery(Base):
     body_battery_status: Mapped[str | None]
     body_battery_level: Mapped[int | None]
     body_battery_version: Mapped[float | None]
+
+
+class BodyBatteryActivityEvent(Base):
+    __tablename__ = "body_battery_activity_event"
+
+    tstamp_start: Mapped[datetime] = mapped_column(primary_key=True)
+    event_type: Mapped[str]
+    duration_seconds: Mapped[int]
+    body_battery_impact: Mapped[int]
+    feedback_type: Mapped[str]
+    short_feedback: Mapped[str]
 
 
 # class Stats(Base):

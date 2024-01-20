@@ -6,7 +6,10 @@ garmin_client = get_garmin_client()
 
 
 # sleep heart Rate + ... + ...
-# print(json.dumps(garmin_client.get_sleep_data("2024-01-12"), indent=4))
+d = garmin_client.get_heart_rates("2024-01-12")
+print(json.dumps(d, indent=4))
+with open("heat_rates.json", "w") as f:
+    json.dump(d, f, indent=4)
 
 # get_spo2_data
 # get_respiration_data

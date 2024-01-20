@@ -103,7 +103,7 @@ def get_stress_battery(start_date: datetime, end_date: datetime | None):
 
 @garmin_group.command("get-body-battery")
 @cli_garmin.garmin_arguments
-def get_body_battery_battery(start_date: datetime, end_date: datetime | None):
+def get_body_battery(start_date: datetime, end_date: datetime | None):
     cli_garmin.get_garmin_data(garmin.get_body_battery_data, start_date, end_date)
 
 
