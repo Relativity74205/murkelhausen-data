@@ -1,6 +1,6 @@
 from datetime import timedelta, datetime
 
-from prefect import flow, serve
+from prefect import serve
 from prefect.client.schemas.schedules import IntervalSchedule
 
 from murkelhausen.prefect.flow_data import data_main_flow

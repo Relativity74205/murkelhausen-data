@@ -3,7 +3,7 @@ from datetime import date, datetime
 from typing import Any
 
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import JSON
+from sqlalchemy import JSON, DateTime
 
 from murkelhausen.persistance_layer.postgres import Base
 
@@ -23,15 +23,17 @@ class HeartRateDailyStats(Base):
 class HeartRate(Base):
     __tablename__ = "heart_rate"
 
-    tstamp: Mapped[datetime] = mapped_column(primary_key=True)
+    tstamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), primary_key=True)
     heart_rate: Mapped[int] = mapped_column(nullable=True)
 
 
 class Steps(Base):
     __tablename__ = "steps"
 
-    tstamp_start: Mapped[datetime] = mapped_column(primary_key=True)
-    tstamp_end: Mapped[datetime]
+    tstamp_start: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), primary_key=True
+    )
+    tstamp_end: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     steps: Mapped[int]
     pushes: Mapped[int]
     primaryActivityLevel: Mapped[str]
@@ -50,8 +52,10 @@ class StepsDaily(Base):
 class Floors(Base):
     __tablename__ = "floors"
 
-    tstamp_start: Mapped[datetime] = mapped_column(primary_key=True)
-    tstamp_end: Mapped[datetime]
+    tstamp_start: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), primary_key=True
+    )
+    tstamp_end: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     floorsAscended: Mapped[int]
     floorsDescended: Mapped[int]
 
@@ -69,7 +73,7 @@ class StressDaily(Base):
 class Stress(Base):
     __tablename__ = "stress"
 
-    tstamp: Mapped[datetime] = mapped_column(primary_key=True)
+    tstamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), primary_key=True)
     stress_level: Mapped[int]
 
 
@@ -88,7 +92,7 @@ class BodyBatteryDaily(Base):
 class BodyBattery(Base):
     __tablename__ = "body_battery"
 
-    tstamp: Mapped[datetime] = mapped_column(primary_key=True)
+    tstamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), primary_key=True)
     body_battery_status: Mapped[str]
     body_battery_level: Mapped[int]
     body_battery_version: Mapped[float]
@@ -97,7 +101,9 @@ class BodyBattery(Base):
 class BodyBatteryActivityEvent(Base):
     __tablename__ = "body_battery_activity_event"
 
-    tstamp_start: Mapped[datetime] = mapped_column(primary_key=True)
+    tstamp_start: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), primary_key=True
+    )
     event_type: Mapped[str]
     duration_seconds: Mapped[int]
     body_battery_impact: Mapped[int]
@@ -141,30 +147,34 @@ class SleepDaily(Base):
 class SleepMovement(Base):
     __tablename__ = "sleep_movement"
 
-    tstamp_start: Mapped[datetime] = mapped_column(primary_key=True)
-    tstamp_end: Mapped[datetime]
+    tstamp_start: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), primary_key=True
+    )
+    tstamp_end: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     activity_level: Mapped[float]
 
 
 class SleepLevels(Base):
     __tablename__ = "sleep_levels"
 
-    tstamp_start: Mapped[datetime] = mapped_column(primary_key=True)
-    tstamp_end: Mapped[datetime]
+    tstamp_start: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), primary_key=True
+    )
+    tstamp_end: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     activity_level: Mapped[int]
 
 
 class SleepRestlessMoments(Base):
     __tablename__ = "sleep_restless_moments"
 
-    tstamp: Mapped[datetime] = mapped_column(primary_key=True)
+    tstamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), primary_key=True)
     value: Mapped[int]
 
 
 class SleepSPO2Data(Base):
     __tablename__ = "sleep_spo2_data"
 
-    tstamp: Mapped[datetime] = mapped_column(primary_key=True)
+    tstamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), primary_key=True)
     epoch_duration: Mapped[int | None]
     spo2_value: Mapped[int | None]
     reading_confidence: Mapped[int | None]
@@ -173,33 +183,33 @@ class SleepSPO2Data(Base):
 class SleepRespirationData(Base):
     __tablename__ = "sleep_respiration_data"
 
-    tstamp: Mapped[datetime] = mapped_column(primary_key=True)
+    tstamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), primary_key=True)
     respiration_value: Mapped[int]
 
 
 class SleepHeartRate(Base):
     __tablename__ = "sleep_heart_rate"
 
-    tstamp: Mapped[datetime] = mapped_column(primary_key=True)
+    tstamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), primary_key=True)
     heart_rate: Mapped[int | None]
 
 
 class SleepStress(Base):
     __tablename__ = "sleep_stress"
 
-    tstamp: Mapped[datetime] = mapped_column(primary_key=True)
+    tstamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), primary_key=True)
     stress_level: Mapped[int]
 
 
 class SleepBodyBattery(Base):
     __tablename__ = "sleep_body_battery"
 
-    tstamp: Mapped[datetime] = mapped_column(primary_key=True)
+    tstamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), primary_key=True)
     body_battery_level: Mapped[int]
 
 
 class SleepHRVData(Base):
     __tablename__ = "sleep_hrv_data"
 
-    tstamp: Mapped[datetime] = mapped_column(primary_key=True)
+    tstamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), primary_key=True)
     hrv_value: Mapped[int]

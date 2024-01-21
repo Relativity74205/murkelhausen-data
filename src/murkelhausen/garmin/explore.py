@@ -5,9 +5,9 @@ from murkelhausen.garmin.main import get_garmin_client
 garmin_client = get_garmin_client()
 
 
-d = garmin_client.get_spo2_data("2023-12-05")
+d = garmin_client.get_sleep_data("2024-01-20")
 print(json.dumps(d, indent=4))
-with open("spo2.json", "w") as f:
+with open("sleep.json", "w") as f:
     json.dump(d, f, indent=4)
 
 

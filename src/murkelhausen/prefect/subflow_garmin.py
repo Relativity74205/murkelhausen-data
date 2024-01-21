@@ -51,15 +51,24 @@ def garmin_flow(start_date: date | None = None, end_date: date | None = None):
 
     futures_daily = defaultdict(dict)
     for count_dates in range((end_date - start_date).days + 1):
-        measure_date = start_date + relativedelta(days=count_dates)
-        futures_daily["heart_rate_data_points"][measure_date] = heart_rate_data.submit(
-            measure_date=measure_date, garmin_client=garmin_client
+        this_date = start_date + relativedelta(days=count_dates)
+        futures_daily["heart_rate_data_points"][this_date] = heart_rate_data.submit(
+            measure_date=this_date, garmin_client=garmin_client
         )
-        futures_daily["steps_data_points"][measure_date] = steps_data.submit(
-            measure_date=measure_date, garmin_client=garmin_client
+        futures_daily["steps_data_points"][this_date] = steps_data.submit(
+            measure_date=this_date, garmin_client=garmin_client
         )
-        futures_daily["floors_data_points"][measure_date] = floors_data.submit(
-            measure_date=measure_date, garmin_client=garmin_client
+        futures_daily["floors_data_points"][this_date] = floors_data.submit(
+            measure_date=this_date, garmin_client=garmin_client
+        )
+        futures_daily["stress_data_points"][this_date] = stress_data.submit(
+            measure_date=this_date, garmin_client=garmin_client
+        )
+        futures_daily["body_battery_data_points"][this_date] = body_battery_data.submit(
+            measure_date=this_date, garmin_client=garmin_client
+        )
+        futures_daily["sleep_data_points"][this_date] = sleep_data.submit(
+            measure_date=this_date, garmin_client=garmin_client
         )
 
     logger.info("Finished starting daily data task(s).")
@@ -86,10 +95,11 @@ def garmin_flow(start_date: date | None = None, end_date: date | None = None):
     logger.info("Created garmin report for daily data.")
 
     logger.info("Starting date range data task(s).")
-    futures_date_range = {}
-    futures_date_range["steps_daily_data_points"] = steps_daily_data.submit(
-        start_date=start_date, end_date=end_date, garmin_client=garmin_client
-    )
+    futures_date_range = {
+        "steps_daily_data_points": steps_daily_data.submit(
+            start_date=start_date, end_date=end_date, garmin_client=garmin_client
+        )
+    }
     logger.info("Finished starting date range data task(s).")
 
     logger.info("Starting to collect date range task results.")
@@ -154,6 +164,33 @@ def floors_data(measure_date: date, garmin_client: Garmin) -> int:
     logger = get_run_logger()
     logger.info(f"Starting task 'garmin floors data' for {measure_date}")
     return garmin.get_floors_data(
+        measure_date=measure_date, garmin_client=garmin_client, logger=logger
+    )
+
+
+@task(task_run_name="garmin_stress_data_{measure_date}")
+def stress_data(measure_date: date, garmin_client: Garmin) -> int:
+    logger = get_run_logger()
+    logger.info(f"Starting task 'garmin stress data' for {measure_date}")
+    return garmin.get_stress_data(
+        measure_date=measure_date, garmin_client=garmin_client, logger=logger
+    )
+
+
+@task(task_run_name="garmin_body_battery_data_{measure_date}")
+def body_battery_data(measure_date: date, garmin_client: Garmin) -> int:
+    logger = get_run_logger()
+    logger.info(f"Starting task 'garmin body battery data' for {measure_date}")
+    return garmin.get_body_battery_data(
+        measure_date=measure_date, garmin_client=garmin_client, logger=logger
+    )
+
+
+@task(task_run_name="garmin_sleep_data_{measure_date}")
+def sleep_data(measure_date: date, garmin_client: Garmin) -> int:
+    logger = get_run_logger()
+    logger.info(f"Starting task 'garmin sleep data' for {measure_date}")
+    return garmin.get_sleep_data(
         measure_date=measure_date, garmin_client=garmin_client, logger=logger
     )
 
