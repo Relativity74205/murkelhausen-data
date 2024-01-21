@@ -1,10 +1,10 @@
-from datetime import date, timedelta, datetime
+from datetime import date, datetime
+from typing import Literal
 
 from prefect import flow, get_run_logger, task
-from prefect.client.schemas.schedules import IntervalSchedule
 
 from murkelhausen.config import config
-from murkelhausen.prefect.subflow_garmin import garmin_flow
+from murkelhausen.prefect import subflow_garmin
 from murkelhausen.prefect.prefect_secret_block import MurkelHausenSecrets
 from murkelhausen.util.logger import setup_logging
 
@@ -29,14 +29,26 @@ def get_secrets():
     )
 
 
-@flow(flow_run_name=_generate_flowrun_name, retry_delay_seconds=60)
-def data_main_flow(start_date: date | None = None, end_date: date | None = None):
+@flow(
+    flow_run_name=_generate_flowrun_name,
+    retry_delay_seconds=60,
+    description="Main flow.",
+)
+def data_main_flow(
+    start_date: date | None = None,
+    end_date: date | None = None,
+    task_to_run: subflow_garmin.TASK_NAMES | None = None,
+):
     logger = get_run_logger()
     logger.info("Getting secrets.")
     get_secrets()
     logger.info("Finished getting secrets.")
-    logger.info(f"Starting Garmin main flow with {start_date=} and {end_date=}.")
-    garmin_flow(start_date=start_date, end_date=end_date)
+    logger.info(
+        f"Starting Garmin main flow with {start_date=} and {end_date=} and {task_to_run=}."
+    )
+    subflow_garmin.garmin_flow(
+        start_date=start_date, end_date=end_date, task_to_run=task_to_run
+    )
     logger.info(f"Finished Garmin main flow with {start_date=} and {end_date=}.")
 
 

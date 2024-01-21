@@ -84,9 +84,7 @@ def get_steps(start_date: datetime, end_date: datetime | None):
 @garmin_group.command("get-steps-daily")
 @cli_garmin.garmin_arguments
 def get_steps_daily(start_date: datetime, end_date: datetime | None):
-    cli_garmin.get_garmin_data_daterange(
-        garmin.get_daily_steps_data, start_date=start_date, end_date=end_date
-    )
+    cli_garmin.get_garmin_data(garmin.get_daily_steps_data, start_date, end_date)
 
 
 @garmin_group.command("get-floors")
