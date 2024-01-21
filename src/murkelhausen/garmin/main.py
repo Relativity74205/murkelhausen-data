@@ -1,5 +1,3 @@
-import json
-
 import pytz
 from datetime import date, datetime, timezone
 
@@ -30,6 +28,12 @@ def _unaware_utc_string_to_europe_berlin_datetime(s: str) -> datetime:
     )
 
 
+def _unix_timestamp_millis_to_europe_berlin_datetime(t: int) -> datetime:
+    return datetime.fromtimestamp(t / 1000, tz=pytz.UTC).astimezone(
+        pytz.timezone("Europe/Berlin")
+    )
+
+
 def get_heartrate_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
     """Returns the amount of heart rate data points saved."""
     logger.info(f"Getting heart rate data for {measure_date}.")
@@ -44,7 +48,7 @@ def get_heartrate_data(*, measure_date: date, garmin_client: Garmin, logger) -> 
     if data["heartRateValues"] is not None:
         heart_rates = tuple(
             objects.HeartRate(
-                tstamp=datetime.fromtimestamp(d[0] / 1000),
+                tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(d[0]),
                 heart_rate=d[1],
             )
             for d in data["heartRateValues"]
@@ -131,7 +135,7 @@ def get_stress_data(*, measure_date: date, garmin_client: Garmin, logger) -> int
     data = garmin_client.get_stress_data(measure_date.isoformat())
     stress = tuple(
         objects.Stress(
-            tstamp=datetime.fromtimestamp(entry[0] / 1000),
+            tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry[0]),
             stress_level=entry[1],
         )
         for entry in data["stressValuesArray"]
@@ -159,7 +163,7 @@ def get_body_battery_data(*, measure_date: date, garmin_client: Garmin, logger) 
     data_stress = garmin_client.get_stress_data(measure_date.isoformat())
     body_battery = tuple(
         objects.BodyBattery(
-            tstamp=datetime.fromtimestamp(entry[0] / 1000),
+            tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry[0]),
             body_battery_status=entry[1],
             body_battery_level=entry[2],
             body_battery_version=entry[3],
@@ -200,3 +204,171 @@ def get_body_battery_data(*, measure_date: date, garmin_client: Garmin, logger) 
     logger.info("Saved body battery activity events data. Done.")
 
     return len(body_battery)
+
+
+def _get_sleep_data_daily(data_sleep: dict, logger):
+    daily_sleep = data_sleep["dailySleepDTO"]
+    sleep_daily = objects.SleepDaily(
+        calendar_date=date.fromisoformat(daily_sleep["calendarDate"]),
+        sleep_time_seconds=daily_sleep["sleepTimeSeconds"],
+        nap_time_seconds=daily_sleep["napTimeSeconds"],
+        sleep_start_tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(
+            daily_sleep["sleepStartTimestampGMT"]
+        ),
+        sleep_end_tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(
+            daily_sleep["sleepEndTimestampGMT"]
+        ),
+        unmeasurable_sleep_seconds=daily_sleep["unmeasurableSleepSeconds"],
+        deep_sleep_seconds=daily_sleep["deepSleepSeconds"],
+        light_sleep_seconds=daily_sleep["lightSleepSeconds"],
+        rem_sleep_seconds=daily_sleep["remSleepSeconds"],
+        awake_sleep_seconds=daily_sleep["awakeSleepSeconds"],
+        average_sp_o_2_value=daily_sleep["averageSpO2Value"],
+        lowest_sp_o_2_value=daily_sleep["lowestSpO2Value"],
+        highest_sp_o_2_value=daily_sleep["highestSpO2Value"],
+        average_sp_o_2_hrsleep=daily_sleep["averageSpO2HRSleep"],
+        average_respiration_value=daily_sleep["averageRespirationValue"],
+        lowest_respiration_value=daily_sleep["lowestRespirationValue"],
+        highest_respiration_value=daily_sleep["highestRespirationValue"],
+        awake_count=daily_sleep["awakeCount"],
+        avg_sleep_stress=daily_sleep["avgSleepStress"],
+        sleep_score_feedback=daily_sleep["sleepScoreFeedback"],
+        sleep_score_insight=daily_sleep["sleepScoreInsight"],
+        sleep_score_personalized_insight=daily_sleep["sleepScorePersonalizedInsight"],
+        restless_moments_count=data_sleep["restlessMomentsCount"],
+        avg_overnight_hrv=data_sleep["avgOvernightHrv"],
+        hrv_status=data_sleep["hrvStatus"],
+        body_battery_change=data_sleep["bodyBatteryChange"],
+        resting_heart_rate=data_sleep["restingHeartRate"],
+        sleep_scores=daily_sleep["sleepScores"],
+    )
+    save_objects((sleep_daily,), upsert=True)
+    logger.info("Saved sleep daily events data. Done.")
+
+
+def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
+    """Returns the amount of sleep data points saved."""
+    logger.info(f"Getting sleep data for {measure_date}.")
+
+    data_sleep = garmin_client.get_sleep_data(measure_date.isoformat())
+    _get_sleep_data_daily(data_sleep, logger)
+
+    sleep_movements = tuple(
+        objects.SleepMovement(
+            tstamp_start=_unaware_utc_string_to_europe_berlin_datetime(
+                entry["startGMT"]
+            ),
+            tstamp_end=_unaware_utc_string_to_europe_berlin_datetime(entry["endGMT"]),
+            activity_level=entry["activityLevel"],
+        )
+        for entry in data_sleep["sleepMovement"]
+    )
+    save_objects(sleep_movements, upsert=True)
+    logger.info(f"Saved sleep movements data ({len(sleep_movements)} rows). Done.")
+
+    sleep_levels = tuple(
+        objects.SleepLevels(
+            tstamp_start=_unaware_utc_string_to_europe_berlin_datetime(
+                entry["startGMT"]
+            ),
+            tstamp_end=_unaware_utc_string_to_europe_berlin_datetime(entry["endGMT"]),
+            activity_level=int(entry["activityLevel"]),
+        )
+        for entry in data_sleep["sleepLevels"]
+    )
+    save_objects(sleep_levels, upsert=True)
+    logger.info(f"Saved sleep levels data ({len(sleep_levels)} rows). Done.")
+
+    sleep_restless_moments = tuple(
+        objects.SleepRestlessMoments(
+            tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry["startGMT"]),
+            value=int(entry["value"]),
+        )
+        for entry in data_sleep["sleepRestlessMoments"]
+    )
+    save_objects(sleep_restless_moments, upsert=True)
+    logger.info(
+        f"Saved sleep restless moments data ({len(sleep_restless_moments)} rows). Done."
+    )
+
+    sleep_spo2_data = tuple(
+        objects.SleepSPO2Data(
+            tstamp=_unaware_utc_string_to_europe_berlin_datetime(
+                entry["epochTimestamp"]
+            ),
+            epoch_duration=entry["epochDuration"],
+            spo2_value=entry["spo2Reading"],
+            reading_confidence=entry["readingConfidence"],
+        )
+        for entry in data_sleep["wellnessEpochSPO2DataDTOList"]
+    )
+    save_objects(sleep_spo2_data, upsert=True)
+    logger.info(f"Saved sleep spo2 data ({len(sleep_spo2_data)} rows). Done.")
+
+    sleep_respiration_data = tuple(
+        objects.SleepRespirationData(
+            tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(
+                entry["startTimeGMT"]
+            ),
+            respiration_value=int(entry["respirationValue"]),
+        )
+        for entry in data_sleep["wellnessEpochRespirationDataDTOList"]
+    )
+    save_objects(sleep_respiration_data, upsert=True)
+    logger.info(
+        f"Saved sleep respiration data ({len(sleep_respiration_data)} rows). Done."
+    )
+
+    sleep_heart_rates = tuple(
+        objects.SleepHeartRate(
+            tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry["startGMT"]),
+            heart_rate=entry["value"],
+        )
+        for entry in data_sleep["sleepHeartRate"]
+    )
+    save_objects(sleep_heart_rates, upsert=True)
+    logger.info(f"Saved sleep heart rate data ({len(sleep_heart_rates)} rows). Done.")
+
+    sleep_stress_data = tuple(
+        objects.SleepStress(
+            tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry["startGMT"]),
+            stress_level=int(entry["value"]),
+        )
+        for entry in data_sleep["sleepStress"]
+    )
+    save_objects(sleep_stress_data, upsert=True)
+    logger.info(f"Saved sleep stress data ({len(sleep_stress_data)} rows). Done.")
+
+    sleep_body_battery_data = tuple(
+        objects.SleepBodyBattery(
+            tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry["startGMT"]),
+            body_battery_level=int(entry["value"]),
+        )
+        for entry in data_sleep["sleepBodyBattery"]
+    )
+    save_objects(sleep_body_battery_data, upsert=True)
+    logger.info(
+        f"Saved sleep body battery data ({len(sleep_body_battery_data)} rows). Done."
+    )
+
+    sleep_hrv_data = tuple(
+        objects.SleepHRVData(
+            tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry["startGMT"]),
+            hrv_value=int(entry["value"]),
+        )
+        for entry in data_sleep["hrvData"]
+    )
+    save_objects(sleep_hrv_data, upsert=True)
+    logger.info(f"Saved sleep hrv data ({len(sleep_hrv_data)} rows). Done.")
+
+    return (
+        len(sleep_movements)
+        + len(sleep_levels)
+        + len(sleep_restless_moments)
+        + len(sleep_spo2_data)
+        + len(sleep_respiration_data)
+        + len(sleep_heart_rates)
+        + len(sleep_stress_data)
+        + len(sleep_body_battery_data)
+        + len(sleep_hrv_data)
+    )
