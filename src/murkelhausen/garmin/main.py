@@ -166,7 +166,7 @@ def get_body_battery_data(*, measure_date: date, garmin_client: Garmin, logger) 
             body_battery_level=entry[2],
             body_battery_version=entry[3],
         )
-        for entry in data_stress["bodyBatteryValuesArray"]
+        for entry in data_stress.get("bodyBatteryValuesArray", tuple())
     )
     logger.info(f"Got {len(body_battery)} body battery data points. Saving.")
     save_objects(body_battery, upsert=True)
@@ -177,10 +177,10 @@ def get_body_battery_data(*, measure_date: date, garmin_client: Garmin, logger) 
         calendar_date=date.fromisoformat(data_body[0]["date"]),
         charged=data_body[0]["charged"],
         drained=data_body[0]["drained"],
-        dynamic_feedback_event=data_body[0]["bodyBatteryDynamicFeedbackEvent"],
-        end_of_day_dynamic_feedback_event=data_body[0][
-            "endOfDayBodyBatteryDynamicFeedbackEvent"
-        ],
+        dynamic_feedback_event=data_body[0].get("bodyBatteryDynamicFeedbackEvent", {}),
+        end_of_day_dynamic_feedback_event=data_body[0].get(
+            "endOfDayBodyBatteryDynamicFeedbackEvent", {}
+        ),
     )
     save_objects((body_battery_daily,), upsert=True)
     logger.info("Saved body battery daily data. Done.")
@@ -196,7 +196,7 @@ def get_body_battery_data(*, measure_date: date, garmin_client: Garmin, logger) 
             feedback_type=entry["feedbackType"],
             short_feedback=entry["shortFeedback"],
         )
-        for entry in data_body[0]["bodyBatteryActivityEvent"]
+        for entry in data_body[0].get("bodyBatteryActivityEvent", tuple())
     )
     save_objects(body_battery_activity_events, upsert=True)
     logger.info("Saved body battery activity events data. Done.")
