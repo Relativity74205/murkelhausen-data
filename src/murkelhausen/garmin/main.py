@@ -28,7 +28,10 @@ def _unaware_utc_string_to_europe_berlin_datetime(s: str) -> datetime:
     )
 
 
-def _unix_timestamp_millis_to_europe_berlin_datetime(t: int) -> datetime:
+def _unix_timestamp_millis_to_europe_berlin_datetime(t: int | None) -> datetime | None:
+    if t is None:
+        return None
+
     return datetime.fromtimestamp(t / 1000, tz=pytz.UTC).astimezone(
         pytz.timezone("Europe/Berlin")
     )

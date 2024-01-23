@@ -81,8 +81,8 @@ class BodyBatteryDaily(Base):
     __tablename__ = "body_battery_daily"
 
     calendar_date: Mapped[date] = mapped_column(primary_key=True)
-    charged: Mapped[int]
-    drained: Mapped[int]
+    charged: Mapped[int | None]
+    drained: Mapped[int | None]
     dynamic_feedback_event: Mapped[dict[str, Any]] = mapped_column(type_=JSON)
     end_of_day_dynamic_feedback_event: Mapped[dict[str, Any]] = mapped_column(
         type_=JSON
@@ -115,32 +115,32 @@ class SleepDaily(Base):
     __tablename__ = "sleep_daily"
 
     calendar_date: Mapped[date] = mapped_column(primary_key=True)
-    sleep_time_seconds: Mapped[int]
-    nap_time_seconds: Mapped[int]
-    sleep_start_tstamp: Mapped[datetime]
-    sleep_end_tstamp: Mapped[datetime]
-    unmeasurable_sleep_seconds: Mapped[int]
-    deep_sleep_seconds: Mapped[int]
-    light_sleep_seconds: Mapped[int]
-    rem_sleep_seconds: Mapped[int]
-    awake_sleep_seconds: Mapped[int]
-    average_sp_o_2_value: Mapped[float]
-    lowest_sp_o_2_value: Mapped[float]
-    highest_sp_o_2_value: Mapped[float]
-    average_sp_o_2_hrsleep: Mapped[float]
-    average_respiration_value: Mapped[float]
-    lowest_respiration_value: Mapped[float]
-    highest_respiration_value: Mapped[float]
-    awake_count: Mapped[int]
-    avg_sleep_stress: Mapped[float]
-    sleep_score_feedback: Mapped[str]
-    sleep_score_insight: Mapped[str]
-    sleep_score_personalized_insight: Mapped[str]
-    restless_moments_count: Mapped[int]
-    avg_overnight_hrv: Mapped[float]
-    hrv_status: Mapped[str]
-    body_battery_change: Mapped[int]
-    resting_heart_rate: Mapped[int]
+    sleep_time_seconds: Mapped[int | None]
+    nap_time_seconds: Mapped[int | None]
+    sleep_start_tstamp: Mapped[datetime | None]
+    sleep_end_tstamp: Mapped[datetime | None]
+    unmeasurable_sleep_seconds: Mapped[int | None]
+    deep_sleep_seconds: Mapped[int | None]
+    light_sleep_seconds: Mapped[int | None]
+    rem_sleep_seconds: Mapped[int | None]
+    awake_sleep_seconds: Mapped[int | None]
+    average_sp_o_2_value: Mapped[float | None]
+    lowest_sp_o_2_value: Mapped[float | None]
+    highest_sp_o_2_value: Mapped[float | None]
+    average_sp_o_2_hrsleep: Mapped[float | None]
+    average_respiration_value: Mapped[float | None]
+    lowest_respiration_value: Mapped[float | None]
+    highest_respiration_value: Mapped[float | None]
+    awake_count: Mapped[int | None]
+    avg_sleep_stress: Mapped[float | None]
+    sleep_score_feedback: Mapped[str | None]
+    sleep_score_insight: Mapped[str | None]
+    sleep_score_personalized_insight: Mapped[str | None]
+    restless_moments_count: Mapped[int | None]
+    avg_overnight_hrv: Mapped[float | None]
+    hrv_status: Mapped[str | None]
+    body_battery_change: Mapped[int | None]
+    resting_heart_rate: Mapped[int | None]
     sleep_scores: Mapped[dict[str, Any]] = mapped_column(type_=JSON)
 
 
