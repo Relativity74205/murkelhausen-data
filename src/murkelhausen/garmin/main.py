@@ -211,37 +211,39 @@ def _get_sleep_data_daily(data_sleep: dict, logger):
     daily_sleep = data_sleep["dailySleepDTO"]
     sleep_daily = objects.SleepDaily(
         calendar_date=date.fromisoformat(daily_sleep["calendarDate"]),
-        sleep_time_seconds=daily_sleep["sleepTimeSeconds"],
-        nap_time_seconds=daily_sleep["napTimeSeconds"],
+        sleep_time_seconds=daily_sleep.get("sleepTimeSeconds", None),
+        nap_time_seconds=daily_sleep.get("napTimeSeconds", None),
         sleep_start_tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(
-            daily_sleep["sleepStartTimestampGMT"]
+            daily_sleep.get("sleepStartTimestampGMT", None)
         ),
         sleep_end_tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(
-            daily_sleep["sleepEndTimestampGMT"]
+            daily_sleep.get("sleepEndTimestampGMT", None)
         ),
-        unmeasurable_sleep_seconds=daily_sleep["unmeasurableSleepSeconds"],
-        deep_sleep_seconds=daily_sleep["deepSleepSeconds"],
-        light_sleep_seconds=daily_sleep["lightSleepSeconds"],
-        rem_sleep_seconds=daily_sleep["remSleepSeconds"],
-        awake_sleep_seconds=daily_sleep["awakeSleepSeconds"],
-        average_sp_o_2_value=daily_sleep["averageSpO2Value"],
-        lowest_sp_o_2_value=daily_sleep["lowestSpO2Value"],
-        highest_sp_o_2_value=daily_sleep["highestSpO2Value"],
-        average_sp_o_2_hrsleep=daily_sleep["averageSpO2HRSleep"],
-        average_respiration_value=daily_sleep["averageRespirationValue"],
-        lowest_respiration_value=daily_sleep["lowestRespirationValue"],
-        highest_respiration_value=daily_sleep["highestRespirationValue"],
-        awake_count=daily_sleep["awakeCount"],
-        avg_sleep_stress=daily_sleep["avgSleepStress"],
-        sleep_score_feedback=daily_sleep["sleepScoreFeedback"],
-        sleep_score_insight=daily_sleep["sleepScoreInsight"],
-        sleep_score_personalized_insight=daily_sleep["sleepScorePersonalizedInsight"],
-        restless_moments_count=data_sleep["restlessMomentsCount"],
-        avg_overnight_hrv=data_sleep["avgOvernightHrv"],
-        hrv_status=data_sleep["hrvStatus"],
-        body_battery_change=data_sleep["bodyBatteryChange"],
-        resting_heart_rate=data_sleep["restingHeartRate"],
-        sleep_scores=daily_sleep["sleepScores"],
+        unmeasurable_sleep_seconds=daily_sleep.get("unmeasurableSleepSeconds", None),
+        deep_sleep_seconds=daily_sleep.get("deepSleepSeconds", None),
+        light_sleep_seconds=daily_sleep.get("lightSleepSeconds", None),
+        rem_sleep_seconds=daily_sleep.get("remSleepSeconds", None),
+        awake_sleep_seconds=daily_sleep.get("awakeSleepSeconds", None),
+        average_sp_o_2_value=daily_sleep.get("averageSpO2Value", None),
+        lowest_sp_o_2_value=daily_sleep.get("lowestSpO2Value", None),
+        highest_sp_o_2_value=daily_sleep.get("highestSpO2Value", None),
+        average_sp_o_2_hrsleep=daily_sleep.get("averageSpO2HRSleep", None),
+        average_respiration_value=daily_sleep.get("averageRespirationValue", None),
+        lowest_respiration_value=daily_sleep.get("lowestRespirationValue", None),
+        highest_respiration_value=daily_sleep.get("highestRespirationValue", None),
+        awake_count=daily_sleep.get("awakeCount", None),
+        avg_sleep_stress=daily_sleep.get("avgSleepStress", None),
+        sleep_score_feedback=daily_sleep.get("sleepScoreFeedback", None),
+        sleep_score_insight=daily_sleep.get("sleepScoreInsight", None),
+        sleep_score_personalized_insight=daily_sleep.get(
+            "sleepScorePersonalizedInsight", None
+        ),
+        restless_moments_count=data_sleep.get("restlessMomentsCount", None),
+        avg_overnight_hrv=data_sleep.get("avgOvernightHrv", None),
+        hrv_status=data_sleep.get("hrvStatus", None),
+        body_battery_change=data_sleep.get("bodyBatteryChange", None),
+        resting_heart_rate=data_sleep.get("restingHeartRate", None),
+        sleep_scores=daily_sleep.get("sleepScores", None),
     )
     save_objects((sleep_daily,), upsert=True)
     logger.info("Saved sleep daily events data. Done.")
