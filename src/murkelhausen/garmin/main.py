@@ -51,10 +51,10 @@ def get_heartrate_data(*, measure_date: date, garmin_client: Garmin, logger) -> 
     if data["heartRateValues"] is not None:
         heart_rates = tuple(
             objects.HeartRate(
-                tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(d[0]),
-                heart_rate=d[1],
+                tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry[0]),
+                heart_rate=entry[1],
             )
-            for d in data["heartRateValues"]
+            for entry in data["heartRateValues"]
         )
     else:
         heart_rates = tuple()
@@ -74,14 +74,16 @@ def get_steps_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
     data = garmin_client.get_steps_data(measure_date)
     steps = tuple(
         objects.Steps(
-            tstamp_start=_unaware_utc_string_to_europe_berlin_datetime(d["startGMT"]),
-            tstamp_end=_unaware_utc_string_to_europe_berlin_datetime(d["endGMT"]),
-            steps=d["steps"],
-            pushes=d["pushes"],
-            primaryActivityLevel=d["primaryActivityLevel"],
-            activityLevelConstant=d["activityLevelConstant"],
+            tstamp_start=_unaware_utc_string_to_europe_berlin_datetime(
+                entry["startGMT"]
+            ),
+            tstamp_end=_unaware_utc_string_to_europe_berlin_datetime(entry["endGMT"]),
+            steps=entry["steps"],
+            pushes=entry["pushes"],
+            primaryActivityLevel=entry["primaryActivityLevel"],
+            activityLevelConstant=entry["activityLevelConstant"],
         )
-        for d in data
+        for entry in data
     )
     logger.info(f"Got {len(steps)} steps data points. Saving.")
     save_objects(steps, upsert=True)
@@ -96,12 +98,12 @@ def get_daily_steps_data(*, measure_date: date, garmin_client: Garmin, logger) -
     data = garmin_client.get_daily_steps(start=measure_date, end=measure_date)
     steps = tuple(
         objects.StepsDaily(
-            calendar_date=date.fromisoformat(d["calendarDate"]),
-            total_steps=d["totalSteps"],
-            total_distance=d["totalDistance"],
-            step_goal=d["stepGoal"],
+            calendar_date=date.fromisoformat(entry["calendarDate"]),
+            total_steps=entry["totalSteps"],
+            total_distance=entry["totalDistance"],
+            step_goal=entry["stepGoal"],
         )
-        for d in data
+        for entry in data
     )
     logger.info(f"Got {len(steps)} daily steps data points. Saving.")
     save_objects(steps, upsert=True)
@@ -121,7 +123,7 @@ def get_floors_data(*, measure_date: date, garmin_client: Garmin, logger) -> int
             floorsAscended=entry[2],
             floorsDescended=entry[3],
         )
-        for entry in data["floorValuesArray"]
+        for entry in data.get("floorValuesArray", tuple())
     )
     logger.info(f"Got {len(floors)} floors data points. Saving.")
     save_objects(floors, upsert=True)
@@ -264,7 +266,7 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
             tstamp_end=_unaware_utc_string_to_europe_berlin_datetime(entry["endGMT"]),
             activity_level=entry["activityLevel"],
         )
-        for entry in data_sleep["sleepMovement"]
+        for entry in data_sleep.get("sleepMovement", tuple())
     )
     save_objects(sleep_movements, upsert=True)
     logger.info(f"Saved sleep movements data ({len(sleep_movements)} rows). Done.")
@@ -277,7 +279,7 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
             tstamp_end=_unaware_utc_string_to_europe_berlin_datetime(entry["endGMT"]),
             activity_level=int(entry["activityLevel"]),
         )
-        for entry in data_sleep["sleepLevels"]
+        for entry in data_sleep.get("sleepLevels", tuple())
     )
     save_objects(sleep_levels, upsert=True)
     logger.info(f"Saved sleep levels data ({len(sleep_levels)} rows). Done.")
@@ -287,7 +289,7 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
             tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry["startGMT"]),
             value=int(entry["value"]),
         )
-        for entry in data_sleep["sleepRestlessMoments"]
+        for entry in data_sleep.get("sleepRestlessMoments", tuple())
     )
     save_objects(sleep_restless_moments, upsert=True)
     logger.info(
@@ -303,7 +305,7 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
             spo2_value=entry["spo2Reading"],
             reading_confidence=entry["readingConfidence"],
         )
-        for entry in data_sleep["wellnessEpochSPO2DataDTOList"]
+        for entry in data_sleep.get("wellnessEpochSPO2DataDTOList", tuple())
     )
     save_objects(sleep_spo2_data, upsert=True)
     logger.info(f"Saved sleep spo2 data ({len(sleep_spo2_data)} rows). Done.")
@@ -315,7 +317,7 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
             ),
             respiration_value=int(entry["respirationValue"]),
         )
-        for entry in data_sleep["wellnessEpochRespirationDataDTOList"]
+        for entry in data_sleep.get("wellnessEpochRespirationDataDTOList", tuple())
     )
     save_objects(sleep_respiration_data, upsert=True)
     logger.info(
@@ -327,7 +329,7 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
             tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry["startGMT"]),
             heart_rate=entry["value"],
         )
-        for entry in data_sleep["sleepHeartRate"]
+        for entry in data_sleep.get("sleepHeartRate", tuple())
     )
     save_objects(sleep_heart_rates, upsert=True)
     logger.info(f"Saved sleep heart rate data ({len(sleep_heart_rates)} rows). Done.")
@@ -337,7 +339,7 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
             tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry["startGMT"]),
             stress_level=int(entry["value"]),
         )
-        for entry in data_sleep["sleepStress"]
+        for entry in data_sleep.get("sleepStress", tuple())
     )
     save_objects(sleep_stress_data, upsert=True)
     logger.info(f"Saved sleep stress data ({len(sleep_stress_data)} rows). Done.")
@@ -347,7 +349,7 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
             tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry["startGMT"]),
             body_battery_level=int(entry["value"]),
         )
-        for entry in data_sleep["sleepBodyBattery"]
+        for entry in data_sleep.get("sleepBodyBattery", tuple())
     )
     save_objects(sleep_body_battery_data, upsert=True)
     logger.info(
@@ -359,7 +361,7 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
             tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry["startGMT"]),
             hrv_value=int(entry["value"]),
         )
-        for entry in data_sleep["hrvData"]
+        for entry in data_sleep.get("hrvData", tuple())
     )
     save_objects(sleep_hrv_data, upsert=True)
     logger.info(f"Saved sleep hrv data ({len(sleep_hrv_data)} rows). Done.")

@@ -93,9 +93,9 @@ class BodyBattery(Base):
     __tablename__ = "body_battery"
 
     tstamp: Mapped[datetime] = mapped_column(DateTime(timezone=True), primary_key=True)
-    body_battery_status: Mapped[str]
-    body_battery_level: Mapped[int]
-    body_battery_version: Mapped[float]
+    body_battery_status: Mapped[str | None]
+    body_battery_level: Mapped[int | None]
+    body_battery_version: Mapped[float | None]
 
 
 class BodyBatteryActivityEvent(Base):
