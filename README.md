@@ -5,16 +5,6 @@
 1. start prefect in docker `prefect server start`
 2. create project `prefect create project 'murkelhausen'`
 
-## prefect raspberry
-
-1. install project python virtual environment
-2. start local prefect agent `supervisord`, setting supervisord up:
-  - create `supervisord.conf` with `prefect agent local install >> supervisord.conf`
-  - install `supervisor` in python virtualenv
-  - 
-3. (if new project) create project `prefect create project 'murkelhausen'`
-4. register flow `python src/murkelhausen/pipeline.py` (from project python environment)
-
 
 ### Dev local
 
