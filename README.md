@@ -1,22 +1,10 @@
 # murkelhausen stuff
 
-## prefect local
-
-1. start prefect in docker `prefect server start`
-2. create project `prefect create project 'murkelhausen'`
-
-
-### Dev local
+## Dev local
 
 ```bash
 prefect run -p src/murkelhausen/pipeline.py
 ```
-
-### TODO
-- change path in supervisord.conf
-- setup systemd for supervisord
-    - http://supervisord.org/running.html#running-supervisord-automatically-on-startup
-    - https://serverfault.com/questions/958625/error-when-adding-supervisord-to-run-via-systemd)
 
 
 ## Garmin Auth (Garth)
@@ -40,14 +28,6 @@ garth.save("~/.garth")
 CREATE SCHEMA data;
 CREATE USER murkelhausen_data WITH PASSWORD '';
 ALTER SCHEMA data OWNER TO murkelhausen_data;
-```
-
-
-## Prefect
-
-```sql
-prefect work-pool create beowulf-local --type process
-prefect worker start --pool beowulf-local
 ```
 
 
