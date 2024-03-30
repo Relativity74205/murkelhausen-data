@@ -211,7 +211,11 @@ def get_body_battery_data(*, measure_date: date, garmin_client: Garmin, logger) 
 
 def _get_sleep_data_daily(data_sleep: dict, logger):
     daily_sleep = data_sleep["dailySleepDTO"]
-    logger.info(f"Sleep daily data: {daily_sleep}.")
+    # logger.info(f"Sleep daily data: {daily_sleep}.")
+    if daily_sleep["calendarDate"] is None:
+        logger.info("No sleep data for this day (yet). Skipping.")
+        return
+
     sleep_daily = objects.SleepDaily(
         calendar_date=date.fromisoformat(daily_sleep["calendarDate"]),
         sleep_time_seconds=daily_sleep.get("sleepTimeSeconds", None),

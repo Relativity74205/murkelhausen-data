@@ -31,6 +31,7 @@ def get_secrets():
 
 @flow(
     flow_run_name=_generate_flowrun_name,
+    retries=3,
     retry_delay_seconds=60,
     description="Main flow.",
 )

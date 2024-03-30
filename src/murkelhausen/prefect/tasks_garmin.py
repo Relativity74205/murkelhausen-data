@@ -6,7 +6,12 @@ from prefect import task, get_run_logger
 from murkelhausen import garmin
 
 
-@task(task_run_name="garmin_client", tags=["garmin"])
+@task(
+    task_run_name="garmin_client",
+    tags=["garmin"],
+    retries=3,
+    retry_delay_seconds=[60, 5 * 60, 15 * 60],
+)
 def get_garmin_client() -> Garmin:
     return garmin.get_garmin_client()
 
