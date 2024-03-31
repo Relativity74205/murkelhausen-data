@@ -263,113 +263,149 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
     data_sleep = garmin_client.get_sleep_data(measure_date.isoformat())
     _get_sleep_data_daily(data_sleep, logger)
 
-    sleep_movements = tuple(
-        objects.SleepMovement(
-            tstamp_start=_unaware_utc_string_to_europe_berlin_datetime(
-                entry["startGMT"]
-            ),
-            tstamp_end=_unaware_utc_string_to_europe_berlin_datetime(entry["endGMT"]),
-            activity_level=entry["activityLevel"],
+    if "sleepMovement" in data_sleep.keys():
+        sleep_movements = tuple(
+            objects.SleepMovement(
+                tstamp_start=_unaware_utc_string_to_europe_berlin_datetime(
+                    entry["startGMT"]
+                ),
+                tstamp_end=_unaware_utc_string_to_europe_berlin_datetime(entry["endGMT"]),
+                activity_level=entry["activityLevel"],
+            )
+            for entry in data_sleep.get("sleepMovement", tuple())
         )
-        for entry in data_sleep.get("sleepMovement", tuple())
-    )
-    save_objects(sleep_movements, upsert=True)
-    logger.info(f"Saved sleep movements data ({len(sleep_movements)} rows). Done.")
+        save_objects(sleep_movements, upsert=True)
+        logger.info(f"Saved sleep movements data ({len(sleep_movements)} rows). Done.")
+    else:
+        sleep_movements = tuple()
+        logger.info("No sleep movement data for this day (yet). Skipping.")
 
-    sleep_levels = tuple(
-        objects.SleepLevels(
-            tstamp_start=_unaware_utc_string_to_europe_berlin_datetime(
-                entry["startGMT"]
-            ),
-            tstamp_end=_unaware_utc_string_to_europe_berlin_datetime(entry["endGMT"]),
-            activity_level=int(entry["activityLevel"]),
+    if "sleepLevels" in data_sleep.keys():
+        sleep_levels = tuple(
+            objects.SleepLevels(
+                tstamp_start=_unaware_utc_string_to_europe_berlin_datetime(
+                    entry["startGMT"]
+                ),
+                tstamp_end=_unaware_utc_string_to_europe_berlin_datetime(entry["endGMT"]),
+                activity_level=int(entry["activityLevel"]),
+            )
+            for entry in data_sleep.get("sleepLevels", tuple())
         )
-        for entry in data_sleep.get("sleepLevels", tuple())
-    )
-    save_objects(sleep_levels, upsert=True)
-    logger.info(f"Saved sleep levels data ({len(sleep_levels)} rows). Done.")
+        save_objects(sleep_levels, upsert=True)
+        logger.info(f"Saved sleep levels data ({len(sleep_levels)} rows). Done.")
+    else:
+        sleep_levels = tuple()
+        logger.info("No sleep levels data for this day (yet). Skipping.")
 
-    sleep_restless_moments = tuple(
-        objects.SleepRestlessMoments(
-            tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry["startGMT"]),
-            value=int(entry["value"]),
+    if "sleepRestlessMoments" in data_sleep.keys():
+        sleep_restless_moments = tuple(
+            objects.SleepRestlessMoments(
+                tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry["startGMT"]),
+                value=int(entry["value"]),
+            )
+            for entry in data_sleep.get("sleepRestlessMoments", tuple())
         )
-        for entry in data_sleep.get("sleepRestlessMoments", tuple())
-    )
-    save_objects(sleep_restless_moments, upsert=True)
-    logger.info(
-        f"Saved sleep restless moments data ({len(sleep_restless_moments)} rows). Done."
-    )
+        save_objects(sleep_restless_moments, upsert=True)
+        logger.info(
+            f"Saved sleep restless moments data ({len(sleep_restless_moments)} rows). Done."
+        )
+    else:
+        sleep_restless_moments = tuple()
+        logger.info("No sleep restless moments data for this day (yet). Skipping.")
 
-    sleep_spo2_data = tuple(
-        objects.SleepSPO2Data(
-            tstamp=_unaware_utc_string_to_europe_berlin_datetime(
-                entry["epochTimestamp"]
-            ),
-            epoch_duration=entry["epochDuration"],
-            spo2_value=entry["spo2Reading"],
-            reading_confidence=entry["readingConfidence"],
+    if "wellnessEpochSPO2DataDTOList" in data_sleep.keys():
+        sleep_spo2_data = tuple(
+            objects.SleepSPO2Data(
+                tstamp=_unaware_utc_string_to_europe_berlin_datetime(
+                    entry["epochTimestamp"]
+                ),
+                epoch_duration=entry["epochDuration"],
+                spo2_value=entry["spo2Reading"],
+                reading_confidence=entry["readingConfidence"],
+            )
+            for entry in data_sleep.get("wellnessEpochSPO2DataDTOList", tuple())
         )
-        for entry in data_sleep.get("wellnessEpochSPO2DataDTOList", tuple())
-    )
-    save_objects(sleep_spo2_data, upsert=True)
-    logger.info(f"Saved sleep spo2 data ({len(sleep_spo2_data)} rows). Done.")
+        save_objects(sleep_spo2_data, upsert=True)
+        logger.info(f"Saved sleep spo2 data ({len(sleep_spo2_data)} rows). Done.")
+    else:
+        sleep_spo2_data = tuple()
+        logger.info("No sleep spo2 data for this day (yet). Skipping.")
 
-    sleep_respiration_data = tuple(
-        objects.SleepRespirationData(
-            tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(
-                entry["startTimeGMT"]
-            ),
-            respiration_value=int(entry["respirationValue"]),
+    if "wellnessEpochRespirationDataDTOList" in data_sleep.keys():
+        sleep_respiration_data = tuple(
+            objects.SleepRespirationData(
+                tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(
+                    entry["startTimeGMT"]
+                ),
+                respiration_value=int(entry["respirationValue"]),
+            )
+            for entry in data_sleep.get("wellnessEpochRespirationDataDTOList", tuple())
         )
-        for entry in data_sleep.get("wellnessEpochRespirationDataDTOList", tuple())
-    )
-    save_objects(sleep_respiration_data, upsert=True)
-    logger.info(
-        f"Saved sleep respiration data ({len(sleep_respiration_data)} rows). Done."
-    )
+        save_objects(sleep_respiration_data, upsert=True)
+        logger.info(
+            f"Saved sleep respiration data ({len(sleep_respiration_data)} rows). Done."
+        )
+    else:
+        sleep_respiration_data = tuple()
+        logger.info("No sleep respiration data for this day (yet). Skipping.")
 
-    sleep_heart_rates = tuple(
-        objects.SleepHeartRate(
-            tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry["startGMT"]),
-            heart_rate=entry["value"],
+    if "sleepHeartRate" in data_sleep.keys():
+        sleep_heart_rates = tuple(
+            objects.SleepHeartRate(
+                tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry["startGMT"]),
+                heart_rate=entry["value"],
+            )
+            for entry in data_sleep.get("sleepHeartRate", tuple())
         )
-        for entry in data_sleep.get("sleepHeartRate", tuple())
-    )
-    save_objects(sleep_heart_rates, upsert=True)
-    logger.info(f"Saved sleep heart rate data ({len(sleep_heart_rates)} rows). Done.")
+        save_objects(sleep_heart_rates, upsert=True)
+        logger.info(f"Saved sleep heart rate data ({len(sleep_heart_rates)} rows). Done.")
+    else:
+        sleep_heart_rates = tuple()
+        logger.info("No sleep heart rate data for this day (yet). Skipping.")
 
-    sleep_stress_data = tuple(
-        objects.SleepStress(
-            tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry["startGMT"]),
-            stress_level=int(entry["value"]),
+    if "sleepStress" in data_sleep.keys():
+        sleep_stress_data = tuple(
+            objects.SleepStress(
+                tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry["startGMT"]),
+                stress_level=int(entry["value"]),
+            )
+            for entry in data_sleep.get("sleepStress", tuple())
         )
-        for entry in data_sleep.get("sleepStress", tuple())
-    )
-    save_objects(sleep_stress_data, upsert=True)
-    logger.info(f"Saved sleep stress data ({len(sleep_stress_data)} rows). Done.")
+        save_objects(sleep_stress_data, upsert=True)
+        logger.info(f"Saved sleep stress data ({len(sleep_stress_data)} rows). Done.")
+    else:
+        sleep_stress_data = tuple()
+        logger.info("No sleep stress data for this day (yet). Skipping.")
 
-    sleep_body_battery_data = tuple(
-        objects.SleepBodyBattery(
-            tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry["startGMT"]),
-            body_battery_level=int(entry["value"]),
+    if "sleepBodyBattery" in data_sleep.keys():
+        sleep_body_battery_data = tuple(
+            objects.SleepBodyBattery(
+                tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry["startGMT"]),
+                body_battery_level=int(entry["value"]),
+            )
+            for entry in data_sleep.get("sleepBodyBattery", tuple())
         )
-        for entry in data_sleep.get("sleepBodyBattery", tuple())
-    )
-    save_objects(sleep_body_battery_data, upsert=True)
-    logger.info(
-        f"Saved sleep body battery data ({len(sleep_body_battery_data)} rows). Done."
-    )
+        save_objects(sleep_body_battery_data, upsert=True)
+        logger.info(
+            f"Saved sleep body battery data ({len(sleep_body_battery_data)} rows). Done."
+        )
+    else:
+        sleep_body_battery_data = tuple()
+        logger.info("No sleep body battery data for this day (yet). Skipping.")
 
-    sleep_hrv_data = tuple(
-        objects.SleepHRVData(
-            tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry["startGMT"]),
-            hrv_value=int(entry["value"]),
+    if "hrvData" in data_sleep.keys():
+        sleep_hrv_data = tuple(
+            objects.SleepHRVData(
+                tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry["startGMT"]),
+                hrv_value=int(entry["value"]),
+            )
+            for entry in data_sleep.get("hrvData", tuple())
         )
-        for entry in data_sleep.get("hrvData", tuple())
-    )
-    save_objects(sleep_hrv_data, upsert=True)
-    logger.info(f"Saved sleep hrv data ({len(sleep_hrv_data)} rows). Done.")
+        save_objects(sleep_hrv_data, upsert=True)
+        logger.info(f"Saved sleep hrv data ({len(sleep_hrv_data)} rows). Done.")
+    else:
+        sleep_hrv_data = tuple()
+        logger.info("No sleep hrv data for this day (yet). Skipping.")
 
     return (
         len(sleep_movements)
