@@ -1,3 +1,5 @@
+import json
+
 import pytz
 from datetime import date, datetime, timezone
 
@@ -261,6 +263,7 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
     logger.info(f"Getting sleep data for {measure_date}.")
 
     data_sleep = garmin_client.get_sleep_data(measure_date.isoformat())
+    logger.info(f"DATA DUMP: {json.dumps(data_sleep, indent=2)}")
     _get_sleep_data_daily(data_sleep, logger)
 
     if "sleepMovement" in data_sleep.keys():
@@ -269,7 +272,9 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
                 tstamp_start=_unaware_utc_string_to_europe_berlin_datetime(
                     entry["startGMT"]
                 ),
-                tstamp_end=_unaware_utc_string_to_europe_berlin_datetime(entry["endGMT"]),
+                tstamp_end=_unaware_utc_string_to_europe_berlin_datetime(
+                    entry["endGMT"]
+                ),
                 activity_level=entry["activityLevel"],
             )
             for entry in data_sleep.get("sleepMovement", tuple())
@@ -286,7 +291,9 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
                 tstamp_start=_unaware_utc_string_to_europe_berlin_datetime(
                     entry["startGMT"]
                 ),
-                tstamp_end=_unaware_utc_string_to_europe_berlin_datetime(entry["endGMT"]),
+                tstamp_end=_unaware_utc_string_to_europe_berlin_datetime(
+                    entry["endGMT"]
+                ),
                 activity_level=int(entry["activityLevel"]),
             )
             for entry in data_sleep.get("sleepLevels", tuple())
@@ -300,7 +307,9 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
     if "sleepRestlessMoments" in data_sleep.keys():
         sleep_restless_moments = tuple(
             objects.SleepRestlessMoments(
-                tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry["startGMT"]),
+                tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(
+                    entry["startGMT"]
+                ),
                 value=int(entry["value"]),
             )
             for entry in data_sleep.get("sleepRestlessMoments", tuple())
@@ -352,13 +361,17 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
     if "sleepHeartRate" in data_sleep.keys():
         sleep_heart_rates = tuple(
             objects.SleepHeartRate(
-                tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry["startGMT"]),
+                tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(
+                    entry["startGMT"]
+                ),
                 heart_rate=entry["value"],
             )
             for entry in data_sleep.get("sleepHeartRate", tuple())
         )
         save_objects(sleep_heart_rates, upsert=True)
-        logger.info(f"Saved sleep heart rate data ({len(sleep_heart_rates)} rows). Done.")
+        logger.info(
+            f"Saved sleep heart rate data ({len(sleep_heart_rates)} rows). Done."
+        )
     else:
         sleep_heart_rates = tuple()
         logger.info("No sleep heart rate data for this day (yet). Skipping.")
@@ -366,7 +379,9 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
     if "sleepStress" in data_sleep.keys():
         sleep_stress_data = tuple(
             objects.SleepStress(
-                tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry["startGMT"]),
+                tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(
+                    entry["startGMT"]
+                ),
                 stress_level=int(entry["value"]),
             )
             for entry in data_sleep.get("sleepStress", tuple())
@@ -380,7 +395,9 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
     if "sleepBodyBattery" in data_sleep.keys():
         sleep_body_battery_data = tuple(
             objects.SleepBodyBattery(
-                tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry["startGMT"]),
+                tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(
+                    entry["startGMT"]
+                ),
                 body_battery_level=int(entry["value"]),
             )
             for entry in data_sleep.get("sleepBodyBattery", tuple())
@@ -396,7 +413,9 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
     if "hrvData" in data_sleep.keys():
         sleep_hrv_data = tuple(
             objects.SleepHRVData(
-                tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(entry["startGMT"]),
+                tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(
+                    entry["startGMT"]
+                ),
                 hrv_value=int(entry["value"]),
             )
             for entry in data_sleep.get("hrvData", tuple())
