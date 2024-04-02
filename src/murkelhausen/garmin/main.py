@@ -266,7 +266,7 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
     logger.info(f"DATA DUMP: {json.dumps(data_sleep, indent=2)}")
     _get_sleep_data_daily(data_sleep, logger)
 
-    if "sleepMovement" in data_sleep.keys():
+    if "sleepMovement" in data_sleep.keys() and data_sleep["sleepMovement"] is not None:
         sleep_movements = tuple(
             objects.SleepMovement(
                 tstamp_start=_unaware_utc_string_to_europe_berlin_datetime(
@@ -285,7 +285,7 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
         sleep_movements = tuple()
         logger.info("No sleep movement data for this day (yet). Skipping.")
 
-    if "sleepLevels" in data_sleep.keys():
+    if "sleepLevels" in data_sleep.keys() and data_sleep["sleepLevels"] is not None:
         sleep_levels = tuple(
             objects.SleepLevels(
                 tstamp_start=_unaware_utc_string_to_europe_berlin_datetime(
@@ -304,7 +304,10 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
         sleep_levels = tuple()
         logger.info("No sleep levels data for this day (yet). Skipping.")
 
-    if "sleepRestlessMoments" in data_sleep.keys():
+    if (
+        "sleepRestlessMoments" in data_sleep.keys()
+        and data_sleep["sleepRestlessMoments"] is not None
+    ):
         sleep_restless_moments = tuple(
             objects.SleepRestlessMoments(
                 tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(
@@ -322,7 +325,10 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
         sleep_restless_moments = tuple()
         logger.info("No sleep restless moments data for this day (yet). Skipping.")
 
-    if "wellnessEpochSPO2DataDTOList" in data_sleep.keys():
+    if (
+        "wellnessEpochSPO2DataDTOList" in data_sleep.keys()
+        and data_sleep["wellnessEpochSPO2DataDTOList"] is not None
+    ):
         sleep_spo2_data = tuple(
             objects.SleepSPO2Data(
                 tstamp=_unaware_utc_string_to_europe_berlin_datetime(
@@ -340,7 +346,10 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
         sleep_spo2_data = tuple()
         logger.info("No sleep spo2 data for this day (yet). Skipping.")
 
-    if "wellnessEpochRespirationDataDTOList" in data_sleep.keys():
+    if (
+        "wellnessEpochRespirationDataDTOList" in data_sleep.keys()
+        and data_sleep["wellnessEpochRespirationDataDTOList"] is not None
+    ):
         sleep_respiration_data = tuple(
             objects.SleepRespirationData(
                 tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(
@@ -358,7 +367,10 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
         sleep_respiration_data = tuple()
         logger.info("No sleep respiration data for this day (yet). Skipping.")
 
-    if "sleepHeartRate" in data_sleep.keys():
+    if (
+        "sleepHeartRate" in data_sleep.keys()
+        and data_sleep["sleepHeartRate"] is not None
+    ):
         sleep_heart_rates = tuple(
             objects.SleepHeartRate(
                 tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(
@@ -376,7 +388,7 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
         sleep_heart_rates = tuple()
         logger.info("No sleep heart rate data for this day (yet). Skipping.")
 
-    if "sleepStress" in data_sleep.keys():
+    if "sleepStress" in data_sleep.keys() and data_sleep["sleepStress"] is not None:
         sleep_stress_data = tuple(
             objects.SleepStress(
                 tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(
@@ -392,7 +404,10 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
         sleep_stress_data = tuple()
         logger.info("No sleep stress data for this day (yet). Skipping.")
 
-    if "sleepBodyBattery" in data_sleep.keys():
+    if (
+        "sleepBodyBattery" in data_sleep.keys()
+        and data_sleep["sleepBodyBattery"] is not None
+    ):
         sleep_body_battery_data = tuple(
             objects.SleepBodyBattery(
                 tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(
@@ -410,7 +425,7 @@ def get_sleep_data(*, measure_date: date, garmin_client: Garmin, logger) -> int:
         sleep_body_battery_data = tuple()
         logger.info("No sleep body battery data for this day (yet). Skipping.")
 
-    if "hrvData" in data_sleep.keys():
+    if "hrvData" in data_sleep.keys() and data_sleep["hrvData"] is not None:
         sleep_hrv_data = tuple(
             objects.SleepHRVData(
                 tstamp=_unix_timestamp_millis_to_europe_berlin_datetime(
